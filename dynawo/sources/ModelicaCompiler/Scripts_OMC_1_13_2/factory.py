@@ -1828,6 +1828,9 @@ class Factory:
             if "data->modelData->nVariablesReal" in line:
                 line = line [ :line.find("=") ] + "= " + str(self.reader.nb_real_vars)+";\n"
                 filtered_func[n] = line
+            if "data->modelData->nStates" in line:
+                line = line [ :line.find(";") ] + " + " + str(len(self.reader.aliases_restored)) + " /* aliased derivative variables */" +line[ line.find(";") : ]
+                filtered_func[n] = line
             if "data->modelData->nDiscreteReal" in line:
                 line = line [ :line.find("=") ] + "= " + str(self.reader.nb_discrete_vars)+";\n"
                 filtered_func[n] = line

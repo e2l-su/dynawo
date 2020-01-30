@@ -276,6 +276,7 @@ class ReaderOMC:
         self.nb_discrete_vars = 0
         self.nb_bool_vars = 0
         self.nb_integer_vars = 0
+        self.aliases_restored = []
         self.external_objects = []
 
     ##
@@ -1151,6 +1152,7 @@ class ReaderOMC:
         # We initialize vars of self.list_vars with initial values found in *_08bnd.c
         self.set_start_value_for_syst_vars()
         self.detect_non_const_real_calculated_variables()
+        self.detect_aliased_derivative_variables()
         # Attribution of indexes done independently to make sure the order is the same as in defineVariables and defineParameters methods
         index_real_var = 0
         index_derivative_var = 0
@@ -1197,12 +1199,107 @@ class ReaderOMC:
             elif "stringParameter" in address:
                 map_var_name_2_addresses[name]= "data->simulationInfo->stringParameter["+str(index_string_param)+"]"
                 index_string_param+=1
+        self.restore_aliased_derivative_variables()
 
         self.nb_real_vars = index_real_var
         self.nb_discrete_vars = index_discrete_var
         self.nb_bool_vars = index_boolean_vars
         self.nb_integer_vars = index_integer_double
         self.find_calculated_variables()
+
+    def detect_aliased_derivative_variables(self):
+        map_dep = self.get_map_dep_vars_for_func()
+        map_num_eq_vars_defined = self.get_map_num_eq_vars_defined()
+        map_derivated_variables_to_their_aliases = {}
+        index_last_der_elem = 0
+        curr_index = 0
+        for var in self.list_vars:
+            if var.is_alias():
+                name = var.get_alias_name()
+                test_param_address(name)
+                if "$DER."+name in map_var_name_2_addresses:
+                    if name not in map_derivated_variables_to_their_aliases:
+                        map_derivated_variables_to_their_aliases[name] = []
+                    map_derivated_variables_to_their_aliases[name].append(var)
+            if "derivativesVars" in map_var_name_2_addresses[var.get_name()]:
+                index_last_der_elem  = curr_index
+            curr_index+=1
+        index_last_state_elem = (index_last_der_elem-1)/2
+
+        for derivative_var in map_derivated_variables_to_their_aliases:
+            nb_diff_equations_with_this_variable = []
+            for f in self.list_func_16dae_c:
+                for line in f.get_body():
+                    if "der(" +derivative_var in line or "der (" +derivative_var in line:
+                        nb_diff_equations_with_this_variable.append(f)
+            nb_aliases_restored = 0
+            if len(nb_diff_equations_with_this_variable) > 1:
+                for var in map_derivated_variables_to_their_aliases[derivative_var]:
+                    map_var_name_2_addresses[var.get_name()]= "realVars"
+                    #Create new derivated variable
+                    new_derivated_var = Variable()
+                    new_derivated_var.set_name("der("+var.get_name()+")")
+                    new_derivated_var.set_variability(var.get_variability())
+                    new_derivated_var.set_causality(var.get_causality())
+                    new_derivated_var.set_type(var.get_type())
+                    self.list_vars.insert(index_last_der_elem+1, new_derivated_var)
+                    self.list_vars.remove(var)
+                    self.list_vars.insert(index_last_state_elem+1, var)
+                    print "BUBU " + str(index_last_der_elem) + " " + str(index_last_state_elem)
+                    index_last_der_elem+=2
+                    index_last_state_elem+=1
+                    map_var_name_2_addresses[new_derivated_var.get_name()]= "derivativesVars"
+
+                    # Modify 1 differential equation to reinject this variable
+                    der_f = nb_diff_equations_with_this_variable[nb_aliases_restored]
+                    print_info("Reinjecting " + var.get_name() + " into differential equation "+ der_f.get_num_omc())
+                    new_body = []
+                    for line in der_f.get_body():
+                        new_line = line
+                        new_line = new_line.replace("der(" + derivative_var, "der(" + var.get_name())
+                        new_line = new_line.replace("der (" + derivative_var, "der (" + var.get_name())
+                        new_line = new_line.replace(derivative_var, var.get_name())
+                        new_body.append(new_line)
+                    der_f.body = new_body
+                    self.aliases_restored.append(var)
+                    if nb_aliases_restored >= len(nb_diff_equations_with_this_variable) - 2:
+                        break
+                    nb_aliases_restored += 1
+
+    def restore_aliased_derivative_variables(self):
+        max_num_omc = 0
+        for f in self.list_func_16dae_c:
+            for line in f.get_body():
+                if int(f.get_num_omc()) > max_num_omc:
+                    max_num_omc = int(f.get_num_omc())
+        for var in self.aliases_restored:
+            # Create algebraic function alias=aliased
+            derivative_var = var.get_alias_name()
+            # Restore alias variable
+            var.set_type("rSta")
+            var.use_start = True
+            var.start_text = []
+            var.start_text.append(map_var_name_2_addresses[derivative_var]+ " /* "+ derivative_var + " */")
+            var.set_alias_name("", False)
+            func = RawFunc()
+            func.set_name("Algebraic equation restoration of "+var.get_name())
+            body = []
+            body.append("{")
+            body.append(map_var_name_2_addresses[var.get_name()]+ " /* "+ var.get_name() + " */ = " + map_var_name_2_addresses[derivative_var]+ " /* "+ derivative_var + " */;")
+            body.append("}")
+            func_num_omc = str(max_num_omc + 1)
+            print_info("Restoring algebraic equation of " + var.get_name() + " (alias of derivated variable "+ derivative_var + ", num_omc = " + func_num_omc+")")
+            func.set_body( body )
+            func.set_num_omc(func_num_omc)
+            max_num_omc += 1
+            self.list_func_16dae_c.append(func)
+            self.map_num_eq_vars_defined[func_num_omc] = [];
+            self.map_num_eq_vars_defined[func_num_omc].append(var.get_name());
+            self.map_vars_depend_vars[func_num_omc] = []
+            self.map_vars_depend_vars[func_num_omc].append(derivative_var)
+            self.map_tag_num_eq[func_num_omc]="assign"
+
+
 
     def detect_non_const_real_calculated_variables(self):
         map_dep = self.get_map_dep_vars_for_func()
@@ -1284,6 +1381,7 @@ class ReaderOMC:
                 assert(var != None)
                 self.list_complex_calculated_vars[var] = f
                 function_to_remove.append(f)
+                print_info("Variable " + var_name + " can be considered as a calculated variable.")
                 map_var_name_2_addresses[var_name]= "SHOULD NOT BE USED - CALCULATED VAR"
         for f in function_to_remove:
             self.list_func_16dae_c.remove(f)
