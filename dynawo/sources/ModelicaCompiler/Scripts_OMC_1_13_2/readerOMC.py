@@ -1241,11 +1241,10 @@ class ReaderOMC:
                     new_derivated_var.set_name("der("+var.get_name()+")")
                     new_derivated_var.set_variability(var.get_variability())
                     new_derivated_var.set_causality(var.get_causality())
-                    new_derivated_var.set_type(var.get_type())
+                    new_derivated_var.set_type("rDer")
                     self.list_vars.insert(index_last_der_elem+1, new_derivated_var)
                     self.list_vars.remove(var)
                     self.list_vars.insert(index_last_state_elem+1, var)
-                    print "BUBU " + str(index_last_der_elem) + " " + str(index_last_state_elem)
                     index_last_der_elem+=2
                     index_last_state_elem+=1
                     map_var_name_2_addresses[new_derivated_var.get_name()]= "derivativesVars"
@@ -1290,7 +1289,6 @@ class ReaderOMC:
             func_num_omc = str(max_num_omc + 1)
             print_info("Restoring algebraic equation of " + var.get_name() + " (alias of derivated variable "+ derivative_var + ", num_omc = " + func_num_omc+")")
             func.set_body( body )
-            func.set_num_omc(func_num_omc)
             max_num_omc += 1
             self.list_func_16dae_c.append(func)
             self.map_num_eq_vars_defined[func_num_omc] = [];
@@ -1298,6 +1296,8 @@ class ReaderOMC:
             self.map_vars_depend_vars[func_num_omc] = []
             self.map_vars_depend_vars[func_num_omc].append(derivative_var)
             self.map_tag_num_eq[func_num_omc]="assign"
+            func.set_num_omc(func_num_omc)
+            self.map_equation_formula[func_num_omc] = var.get_name() + " = " + derivative_var
 
 
 
