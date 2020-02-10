@@ -1199,7 +1199,7 @@ class ReaderOMC:
             elif "stringParameter" in address:
                 map_var_name_2_addresses[name]= "data->simulationInfo->stringParameter["+str(index_string_param)+"]"
                 index_string_param+=1
-        self.restore_aliased_derivative_variables()
+        #self.restore_aliased_derivative_variables()
 
         self.nb_real_vars = index_real_var
         self.nb_discrete_vars = index_discrete_var
@@ -1231,39 +1231,57 @@ class ReaderOMC:
             for f in self.list_func_16dae_c:
                 for line in f.get_body():
                     if "der(" +derivative_var in line or "der (" +derivative_var in line:
-                        nb_diff_equations_with_this_variable.append(f)
+                        line = line.replace("der(" +derivative_var,"TMP").replace("der (" +derivative_var,"TMP")
+                        if not "der(" in line or "der (" in line:
+                            nb_diff_equations_with_this_variable.append(f)
             nb_aliases_restored = 0
             if len(nb_diff_equations_with_this_variable) > 1:
-                for var in map_derivated_variables_to_their_aliases[derivative_var]:
-                    map_var_name_2_addresses[var.get_name()]= "realVars"
-                    #Create new derivated variable
-                    new_derivated_var = Variable()
-                    new_derivated_var.set_name("der("+var.get_name()+")")
-                    new_derivated_var.set_variability(var.get_variability())
-                    new_derivated_var.set_causality(var.get_causality())
-                    new_derivated_var.set_type("rDer")
-                    self.list_vars.insert(index_last_der_elem+1, new_derivated_var)
-                    self.list_vars.remove(var)
-                    self.list_vars.insert(index_last_state_elem+1, var)
-                    index_last_der_elem+=2
-                    index_last_state_elem+=1
-                    map_var_name_2_addresses[new_derivated_var.get_name()]= "derivativesVars"
+                while nb_aliases_restored < len(nb_diff_equations_with_this_variable) - 1:
+#                 for var in map_derivated_variables_to_their_aliases[derivative_var]:
+                    f = nb_diff_equations_with_this_variable[nb_aliases_restored + 1]
+                    f_num_omc = f.get_num_omc()
+                    name_var_eval = None
 
-                    # Modify 1 differential equation to reinject this variable
-                    der_f = nb_diff_equations_with_this_variable[nb_aliases_restored]
-                    print_info("Reinjecting " + var.get_name() + " into differential equation "+ der_f.get_num_omc())
-                    new_body = []
-                    for line in der_f.get_body():
-                        new_line = line
-                        new_line = new_line.replace("der(" + derivative_var, "der(" + var.get_name())
-                        new_line = new_line.replace("der (" + derivative_var, "der (" + var.get_name())
-                        new_line = new_line.replace(derivative_var, var.get_name())
-                        new_body.append(new_line)
-                    der_f.body = new_body
-                    self.aliases_restored.append(var)
-                    if nb_aliases_restored >= len(nb_diff_equations_with_this_variable) - 2:
-                        break
+                    # for Modelica reinit equations, the evaluated var scan does not always work
+                    # a fallback is to look at the variable defined in this case
+                    if f_num_omc in map_num_eq_vars_defined.keys():
+                        if len(map_num_eq_vars_defined[f_num_omc]) > 1:
+                            error_exit("   Error: Found an equation (id: " + eq_mak_num_omc+") defining multiple variables. This is not supported in Dynawo.")
+                        name_var_eval = map_num_eq_vars_defined[f_num_omc] [0]
+
+                    print_info("Equation " + f_num_omc + " with derivatives is considered as algebraic as der("+derivative_var+") is already computed in another equation.")
+                    self.derivative_residual_vars.remove(name_var_eval)
+                    self.assign_residual_vars.append(name_var_eval)
                     nb_aliases_restored += 1
+#                     map_var_name_2_addresses[var.get_name()]= "realVars"
+#                     #Create new derivated variable
+#                     new_derivated_var = Variable()
+#                     new_derivated_var.set_name("der("+var.get_name()+")")
+#                     new_derivated_var.set_variability(var.get_variability())
+#                     new_derivated_var.set_causality(var.get_causality())
+#                     new_derivated_var.set_type("rDer")
+#                     self.list_vars.insert(index_last_der_elem+1, new_derivated_var)
+#                     self.list_vars.remove(var)
+#                     self.list_vars.insert(index_last_state_elem+1, var)
+#                     index_last_der_elem+=2
+#                     index_last_state_elem+=1
+#                     map_var_name_2_addresses[new_derivated_var.get_name()]= "derivativesVars"
+#
+#                     # Modify 1 differential equation to reinject this variable
+#                     der_f = nb_diff_equations_with_this_variable[nb_aliases_restored]
+#                     print_info("Reinjecting " + var.get_name() + " into differential equation "+ der_f.get_num_omc())
+#                     new_body = []
+#                     for line in der_f.get_body():
+#                         new_line = line
+#                         new_line = new_line.replace("der(" + derivative_var, "der(" + var.get_name())
+#                         new_line = new_line.replace("der (" + derivative_var, "der (" + var.get_name())
+#                         new_line = new_line.replace(derivative_var, var.get_name())
+#                         new_body.append(new_line)
+#                     der_f.body = new_body
+#                     self.aliases_restored.append(var)
+#                     if nb_aliases_restored >= len(nb_diff_equations_with_this_variable) - 2:
+#                         break
+#                     nb_aliases_restored += 1
 
     def restore_aliased_derivative_variables(self):
         max_num_omc = 0
