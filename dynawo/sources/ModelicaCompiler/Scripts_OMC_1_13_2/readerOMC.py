@@ -1199,7 +1199,6 @@ class ReaderOMC:
             elif "stringParameter" in address:
                 map_var_name_2_addresses[name]= "data->simulationInfo->stringParameter["+str(index_string_param)+"]"
                 index_string_param+=1
-        #self.restore_aliased_derivative_variables()
 
         self.nb_real_vars = index_real_var
         self.nb_discrete_vars = index_discrete_var
@@ -1210,114 +1209,85 @@ class ReaderOMC:
     def detect_aliased_derivative_variables(self):
         map_dep = self.get_map_dep_vars_for_func()
         map_num_eq_vars_defined = self.get_map_num_eq_vars_defined()
-        map_derivated_variables_to_their_aliases = {}
-        index_last_der_elem = 0
-        curr_index = 0
+
+        # Detect derived variables
+        derivated_variables_list = []
         for var in self.list_vars:
-            if var.is_alias():
-                name = var.get_alias_name()
-                test_param_address(name)
-                if "$DER."+name in map_var_name_2_addresses:
-                    if name not in map_derivated_variables_to_their_aliases:
-                        map_derivated_variables_to_their_aliases[name] = []
-                    map_derivated_variables_to_their_aliases[name].append(var)
-            if "derivativesVars" in map_var_name_2_addresses[var.get_name()]:
-                index_last_der_elem  = curr_index
-            curr_index+=1
-        index_last_state_elem = (index_last_der_elem-1)/2
+            name = var.get_name()
+            test_param_address(name)
+            if "$DER."+name in map_var_name_2_addresses:
+                derivated_variables_list.append(name)
 
-        for derivative_var in map_derivated_variables_to_their_aliases:
-            nb_diff_equations_with_this_variable = []
-            for f in self.list_func_16dae_c:
-                for line in f.get_body():
-                    if "der(" +derivative_var in line or "der (" +derivative_var in line:
-                        line = line.replace("der(" +derivative_var,"TMP").replace("der (" +derivative_var,"TMP")
-                        if not "der(" in line or "der (" in line:
-                            nb_diff_equations_with_this_variable.append(f)
-            nb_aliases_restored = 0
-            if len(nb_diff_equations_with_this_variable) > 1:
-                while nb_aliases_restored < len(nb_diff_equations_with_this_variable) - 1:
-#                 for var in map_derivated_variables_to_their_aliases[derivative_var]:
-                    f = nb_diff_equations_with_this_variable[nb_aliases_restored + 1]
-                    f_num_omc = f.get_num_omc()
-                    name_var_eval = None
-
-                    # for Modelica reinit equations, the evaluated var scan does not always work
-                    # a fallback is to look at the variable defined in this case
-                    if f_num_omc in map_num_eq_vars_defined.keys():
-                        if len(map_num_eq_vars_defined[f_num_omc]) > 1:
-                            error_exit("   Error: Found an equation (id: " + eq_mak_num_omc+") defining multiple variables. This is not supported in Dynawo.")
-                        name_var_eval = map_num_eq_vars_defined[f_num_omc] [0]
-
-                    print_info("Equation " + f_num_omc + " with derivatives is considered as algebraic as der("+derivative_var+") is already computed in another equation.")
-                    self.derivative_residual_vars.remove(name_var_eval)
-                    self.assign_residual_vars.append(name_var_eval)
-                    nb_aliases_restored += 1
-#                     map_var_name_2_addresses[var.get_name()]= "realVars"
-#                     #Create new derivated variable
-#                     new_derivated_var = Variable()
-#                     new_derivated_var.set_name("der("+var.get_name()+")")
-#                     new_derivated_var.set_variability(var.get_variability())
-#                     new_derivated_var.set_causality(var.get_causality())
-#                     new_derivated_var.set_type("rDer")
-#                     self.list_vars.insert(index_last_der_elem+1, new_derivated_var)
-#                     self.list_vars.remove(var)
-#                     self.list_vars.insert(index_last_state_elem+1, var)
-#                     index_last_der_elem+=2
-#                     index_last_state_elem+=1
-#                     map_var_name_2_addresses[new_derivated_var.get_name()]= "derivativesVars"
-#
-#                     # Modify 1 differential equation to reinject this variable
-#                     der_f = nb_diff_equations_with_this_variable[nb_aliases_restored]
-#                     print_info("Reinjecting " + var.get_name() + " into differential equation "+ der_f.get_num_omc())
-#                     new_body = []
-#                     for line in der_f.get_body():
-#                         new_line = line
-#                         new_line = new_line.replace("der(" + derivative_var, "der(" + var.get_name())
-#                         new_line = new_line.replace("der (" + derivative_var, "der (" + var.get_name())
-#                         new_line = new_line.replace(derivative_var, var.get_name())
-#                         new_body.append(new_line)
-#                     der_f.body = new_body
-#                     self.aliases_restored.append(var)
-#                     if nb_aliases_restored >= len(nb_diff_equations_with_this_variable) - 2:
-#                         break
-#                     nb_aliases_restored += 1
-
-    def restore_aliased_derivative_variables(self):
-        max_num_omc = 0
+        # Associates der variables to their equations and vice-versa
+        map_diff_function_to_der_var = {}
+        map_der_var_to_diff_function = {}
         for f in self.list_func_16dae_c:
+            name_var_eval = None
+            if f.get_num_omc() in map_num_eq_vars_defined.keys():
+                if len(map_num_eq_vars_defined[f.get_num_omc()]) > 1:
+                    error_exit("   Error: Found an equation (id: " + f.get_num_omc()+") defining multiple variables. This is not supported in Dynawo.")
+                name_var_eval = map_num_eq_vars_defined[f.get_num_omc()] [0]
+            if name_var_eval not in derivated_variables_list and name_var_eval not in self.derivative_residual_vars: continue
             for line in f.get_body():
-                if int(f.get_num_omc()) > max_num_omc:
-                    max_num_omc = int(f.get_num_omc())
-        for var in self.aliases_restored:
-            # Create algebraic function alias=aliased
-            derivative_var = var.get_alias_name()
-            # Restore alias variable
-            var.set_type("rSta")
-            var.use_start = True
-            var.start_text = []
-            var.start_text.append(map_var_name_2_addresses[derivative_var]+ " /* "+ derivative_var + " */")
-            var.set_alias_name("", False)
-            func = RawFunc()
-            func.set_name("Algebraic equation restoration of "+var.get_name())
-            body = []
-            body.append("{")
-            body.append(map_var_name_2_addresses[var.get_name()]+ " /* "+ var.get_name() + " */ = " + map_var_name_2_addresses[derivative_var]+ " /* "+ derivative_var + " */;")
-            body.append("}")
-            func_num_omc = str(max_num_omc + 1)
-            print_info("Restoring algebraic equation of " + var.get_name() + " (alias of derivated variable "+ derivative_var + ", num_omc = " + func_num_omc+")")
-            func.set_body( body )
-            max_num_omc += 1
-            self.list_func_16dae_c.append(func)
-            self.map_num_eq_vars_defined[func_num_omc] = [];
-            self.map_num_eq_vars_defined[func_num_omc].append(var.get_name());
-            self.map_vars_depend_vars[func_num_omc] = []
-            self.map_vars_depend_vars[func_num_omc].append(derivative_var)
-            self.map_tag_num_eq[func_num_omc]="assign"
-            func.set_num_omc(func_num_omc)
-            self.map_equation_formula[func_num_omc] = var.get_name() + " = " + derivative_var
+                for derivative_var in derivated_variables_list:
+                    if "der(" +derivative_var in line or "der (" +derivative_var in line:
+                        if f not in map_diff_function_to_der_var:
+                            map_diff_function_to_der_var[f] = []
+                        map_diff_function_to_der_var[f].append(derivative_var)
+                        if derivative_var not in map_der_var_to_diff_function:
+                            map_der_var_to_diff_function[derivative_var] = []
+                        map_der_var_to_diff_function[derivative_var].append(f)
+        modified=True
+        while modified:
+            f_to_remove = []
+            for derivative_var in map_der_var_to_diff_function:
+                if len(map_der_var_to_diff_function[derivative_var]) == 1:
+                    f_to_remove.append(map_der_var_to_diff_function[derivative_var][0])
+            modified = len(f_to_remove) > 0
+            for f in f_to_remove:
+                del map_diff_function_to_der_var[f]
+                for derivative_var in map_der_var_to_diff_function:
+                    if f in map_der_var_to_diff_function[derivative_var]:
+                        map_der_var_to_diff_function[derivative_var].remove(f)
 
 
+        # Detect derived variables that appears in multiple equations
+        derivated_variables_associated_to_multiple_equations_list = []
+        for derivative_var in map_der_var_to_diff_function:
+            if len(map_der_var_to_diff_function[derivative_var]) > 1 and derivative_var not in derivated_variables_associated_to_multiple_equations_list:
+                derivated_variables_associated_to_multiple_equations_list.append(derivative_var)
+
+        # Detect equations that only contains variables from derivated_variables_associated_to_multiple_equations_list list
+        duplicated_diff_equations = []
+        for f in map_diff_function_to_der_var:
+            var_list = map_diff_function_to_der_var[f]
+            number_of_var = 0
+            for derivative_var in derivated_variables_associated_to_multiple_equations_list:
+                if derivative_var in var_list:
+                    number_of_var+=1
+            if number_of_var == len(var_list):
+                duplicated_diff_equations.append(f)
+
+        nb_aliases_to_restore = len(duplicated_diff_equations) - len(derivated_variables_associated_to_multiple_equations_list)
+        nb_aliases_restored_global = 0
+        for derivative_var in derivated_variables_associated_to_multiple_equations_list:
+            if nb_aliases_restored_global >= nb_aliases_to_restore: break
+            f_index = 0
+            while f_index < len(map_der_var_to_diff_function[derivative_var]) - 1:
+                f = map_der_var_to_diff_function[derivative_var][f_index + 1]
+                f_index+=1
+                if f not in duplicated_diff_equations: continue
+                f_num_omc = f.get_num_omc()
+                name_var_eval = None
+                if f_num_omc in map_num_eq_vars_defined.keys():
+                    if len(map_num_eq_vars_defined[f_num_omc]) > 1:
+                        error_exit("   Error: Found an equation (id: " + f_num_omc+") defining multiple variables. This is not supported in Dynawo.")
+                    name_var_eval = map_num_eq_vars_defined[f_num_omc] [0]
+                print_info("Equation " + f_num_omc + " with derivatives is considered as algebraic as der("+derivative_var+") is already computed in another equation.")
+                self.derivative_residual_vars.remove(name_var_eval)
+                self.assign_residual_vars.append(name_var_eval)
+                nb_aliases_restored_global+=1
+                if nb_aliases_restored_global >= nb_aliases_to_restore: break
 
     def detect_non_const_real_calculated_variables(self):
         map_dep = self.get_map_dep_vars_for_func()
