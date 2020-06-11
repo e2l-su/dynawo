@@ -459,6 +459,9 @@ void SolverSIM::handleMaximumTries(int& counter) {
     throw DYNError(Error::SOLVER_ALGO, SolverSIMConvFail, maxNewtonTry_);
 }
 
+bool compareStateG(state_g lhs, state_g rhs) {
+  return (rhs == ROOT_UP && lhs == ROOT_DOWN);
+}
 SolverSIM::SolverStatus_t
 SolverSIM::solve() {
   /*
@@ -479,10 +482,10 @@ SolverSIM::solve() {
     ++stats_.nge_;
 
     // No root change -> no discrete variable change neither mode change
-    if (std::equal(g0_.begin(), g0_.end(), g1_.begin())) {
+    if (std::equal(g0_.begin(), g0_.end(), g1_.begin(), compareStateG)) {
       if (flag == KIN_INITIAL_GUESS_OK) {
         skipNextNR_ = skipNRIfInitialGuessOK_;
-        if(skipNextNR_)
+        if (skipNextNR_)
           Trace::info() << DYNLog(SolverSIMInitGuessOK) << Trace::endline;
       }
       return CONV;
