@@ -413,6 +413,9 @@ ModelMulti::evalG(double t, vector<state_g> &g) {
   for (unsigned int i = 0; i < subModels_.size(); ++i)
     subModels_[i]->evalGSub(t);
 
+  for (int i = 0; i < sizeG(); ++i)
+    Trace::info() << "BUBU G " << i << " " << gLocal_[i] << Trace::endline;
+
   std::copy(gLocal_, gLocal_ + sizeG_, g.begin());
 }
 
@@ -470,6 +473,9 @@ ModelMulti::evalZ(double t) {
     zSave_.assign(sizeZ(), 0.);
 
   zChange_ = propagateZModif();
+
+  for (int i = 0; i < sizeZ(); ++i)
+    Trace::info() << "BUBU Z " << i << " " << zLocal_[i] << Trace::endline;
 }
 
 bool

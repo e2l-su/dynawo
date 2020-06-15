@@ -98,6 +98,16 @@ static const state_g ROOT_DOWN = -1;  ///< ROOT is unactivated
 static const state_g NO_ROOT = 0;  ///< State of the root is undefined
 
 /**
+ * @brief return false if there is a rising edge in roots
+ * @param before root value before update
+ * @param after root value after update
+ * @return false if there is a rising edge in roots
+ */
+inline bool compareStateG(state_g before, state_g after) {
+  return !(after == ROOT_UP && before == ROOT_DOWN);
+}
+
+/**
  * @brief return the property of variable(differential, algebraic, or external)
  * @param property : property of a variable as an enum type
  * @return property of a variable as a string

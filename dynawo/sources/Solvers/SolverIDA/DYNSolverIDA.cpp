@@ -429,7 +429,7 @@ SolverIDA::calculateIC() {
     change = false;
     model_->copyContinuousVariables(&vYy_[0], &vYp_[0]);
     model_->evalG(tSolve_, g1_);
-    if (!(std::equal(g0_.begin(), g0_.end(), g1_.begin()))) {
+    if (!(std::equal(g0_.begin(), g0_.end(), g1_.begin(), compareStateG))) {
       g0_.assign(g1_.begin(), g1_.end());
       change = evalZMode(g0_, g1_, tSolve_);
     }
@@ -772,7 +772,7 @@ SolverIDA::reinit() {
       // Root stabilization
       model_->evalG(tSolve_, g1_);
       ++stats_.nge_;
-      if (std::equal(g0_.begin(), g0_.end(), g1_.begin())) {
+      if (std::equal(g0_.begin(), g0_.end(), g1_.begin(), compareStateG)) {
         break;
       } else {
         g0_.assign(g1_.begin(), g1_.end());

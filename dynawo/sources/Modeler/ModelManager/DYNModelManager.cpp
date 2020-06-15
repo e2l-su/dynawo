@@ -896,7 +896,7 @@ ModelManager::solveParameters() {
 
     // Detection of potential root crossing
     // ----------------------------------------------
-    stableRoot = std::equal(g0.begin(), g0.end(), g1.begin());
+    stableRoot = std::equal(g0.begin(), g0.end(), g1.begin(), compareStateG);
 #ifdef _DEBUG_
     if (!stableRoot) {
       vector<state_g>::const_iterator iG0(g0.begin());

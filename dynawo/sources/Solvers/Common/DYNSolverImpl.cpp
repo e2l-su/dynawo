@@ -290,7 +290,7 @@ Solver::Impl::detectUnstableRoot(vector<state_g> &vGout0, vector<state_g> &vGout
 
   // Find if some roots appears/disappears
   // ---------------------------------------
-  bool stableRoot = std::equal(vGout0.begin(), vGout0.end(), vGout1.begin());
+  bool stableRoot = std::equal(vGout0.begin(), vGout0.end(), vGout1.begin(), compareStateG);
 
   if (!stableRoot) {
 #ifdef _DEBUG_

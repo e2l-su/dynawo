@@ -254,7 +254,7 @@ SolverSIM::calculateIC() {
 
     // Updating discrete variable values and mode
     model_->evalG(tSolve_, g1_);
-    if (std::equal(g0_.begin(), g0_.end(), g1_.begin())) {
+    if (std::equal(g0_.begin(), g0_.end(), g1_.begin(), compareStateG)) {
       break;
     } else {
       g0_.assign(g1_.begin(), g1_.end());
@@ -459,9 +459,6 @@ void SolverSIM::handleMaximumTries(int& counter) {
     throw DYNError(Error::SOLVER_ALGO, SolverSIMConvFail, maxNewtonTry_);
 }
 
-bool compareStateG(state_g lhs, state_g rhs) {
-  return (rhs == ROOT_UP && lhs == ROOT_DOWN);
-}
 SolverSIM::SolverStatus_t
 SolverSIM::solve() {
   /*
@@ -683,7 +680,7 @@ SolverSIM::reinit() {
     // Root stabilization - tSolve_ has been updated in the solve method to the current time
     model_->evalG(tSolve_, g1_);
     ++stats_.nge_;
-    if (std::equal(g0_.begin(), g0_.end(), g1_.begin())) {
+    if (std::equal(g0_.begin(), g0_.end(), g1_.begin(), compareStateG)) {
       break;
     } else {
       g0_.assign(g1_.begin(), g1_.end());

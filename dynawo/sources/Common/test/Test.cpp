@@ -503,6 +503,20 @@ TEST(CommonTest, testEnumUtils) {
   ASSERT_EQ(paramScope2Str(EXTERNAL_PARAMETER), "external parameter");
   ASSERT_EQ(paramScope2Str(SHARED_PARAMETER), "shared parameter");
   ASSERT_EQ(paramScope2Str(INTERNAL_PARAMETER), "internal parameter");
+
+  std::vector<state_g> g0(2, ROOT_DOWN);
+  std::vector<state_g> g1(2, ROOT_DOWN);
+  ASSERT_TRUE(std::equal(g0.begin(), g0.end(), g1.begin(), compareStateG));
+  g1[0] = ROOT_UP;
+  ASSERT_FALSE(std::equal(g0.begin(), g0.end(), g1.begin(), compareStateG));
+  g0[0] = ROOT_UP;
+  g1[0] = ROOT_DOWN;
+  ASSERT_TRUE(std::equal(g0.begin(), g0.end(), g1.begin(), compareStateG));
+  g0[0] = ROOT_UP;
+  g0[1] = ROOT_UP;
+  g1[0] = ROOT_UP;
+  g1[1] = ROOT_UP;
+  ASSERT_TRUE(std::equal(g0.begin(), g0.end(), g1.begin(), compareStateG));
 }
 TEST(CommonTest, testTimer) {
   Timer t("test");
