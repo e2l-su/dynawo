@@ -291,11 +291,13 @@ Solver::Impl::detectUnstableRoot(vector<state_g> &vGout0, vector<state_g> &vGout
   // Find if some roots appears/disappears
   // ---------------------------------------
   bool stableRoot = std::equal(vGout0.begin(), vGout0.end(), vGout1.begin(), compareStateG);
+#ifdef _DEBUG_
+  Trace::debug() << "BUBU START IMPL" << Trace::endline;
+  printUnstableRoot(vGout0, vGout1);
+  Trace::debug() << "BUBU END IMPL" << Trace::endline;
+#endif
 
   if (!stableRoot) {
-#ifdef _DEBUG_
-  printUnstableRoot(vGout0, vGout1);
-#endif
     std::copy(vGout1.begin(), vGout1.end(), vGout0.begin());
   }
 

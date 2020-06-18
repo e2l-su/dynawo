@@ -772,6 +772,11 @@ SolverIDA::reinit() {
       // Root stabilization
       model_->evalG(tSolve_, g1_);
       ++stats_.nge_;
+#ifdef _DEBUG_
+  Trace::debug() << "BUBU START IDA" << Trace::endline;
+  printUnstableRoot(g0_, g1_);
+  Trace::debug() << "BUBU END IDA" << Trace::endline;
+#endif
       if (std::equal(g0_.begin(), g0_.end(), g1_.begin(), compareStateG)) {
         break;
       } else {

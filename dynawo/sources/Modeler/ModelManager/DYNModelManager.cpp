@@ -390,6 +390,8 @@ ModelManager::evalZ(const double &t) {
     setManagerTime(t);
 
     modelModelica()->setZomc();
+    for (int i = 0; i < modelData()->nVariablesBoolean; ++i)
+      Trace::info() << "BUBU BOOL " << name() << " " << i << " " <<  (data()->localData[0]->booleanVars[i] > 0) << Trace::endline;
   }
 }
 
@@ -1260,6 +1262,9 @@ ModelManager::rotateBuffers() {
   // copy data()->localData[0]->booleanVars -> simulationInfo()->booleanVarsPre
   if ( modelData()->nVariablesBoolean > 0)
     memcpy(simulationInfo()->booleanVarsPre, data()->localData[0]->booleanVars, sizeof (data()->localData[0]->booleanVars[0]) * modelData()->nVariablesBoolean);
+  for (int i = 0; i < modelData()->nVariablesBoolean; ++i)
+    Trace::info() << "BUBU PRE " << name() << " " << i << " " <<  (simulationInfo()->booleanVarsPre[i] > 0) << Trace::endline;
+
 
   // copy  data()->localData[0]->discreteVars -> simulationInfo()->discreteVarsPre
   if ( data()->nbZ > 0)
