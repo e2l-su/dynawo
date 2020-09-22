@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2019, RTE (http://www.rte-france.com)
+# Copyright (c) 2015-2020, RTE (http://www.rte-france.com)
 # See AUTHORS.txt
 # All rights reserved.
 # This Source Code Form is subject to the terms of the Mozilla Public
@@ -128,6 +128,14 @@ else()
   set(boost_version        1.64.0)
   set(boost_md5            319C6FFBBECCC366F14BB68767A6DB79)
 endif()
+
+if ( CXX11_ENABLED )  # --------------------------------------------------------------            # Start New part for IIDM-2
+  if(${boost_version} STRLESS "1.65.0")
+    set( boost_version "1.65.0")
+    set(boost_md5          d75a27ad1a34cfc7c9b5cb92594410c3)
+  endif()
+endif ( CXX11_ENABLED )  # -----------------------------------------------------------            # End New part for IIDM-2
+
 string(REPLACE "." "_" boost_version_ ${boost_version})
 set(boost_name           boost_${boost_version_}.tar.gz)
 if(DEFINED ENV{DYNAWO_BOOST_DOWNLOAD_URL})
@@ -135,6 +143,7 @@ if(DEFINED ENV{DYNAWO_BOOST_DOWNLOAD_URL})
 else()
   set(boost_prefix_url https://sourceforge.net/projects/boost/files/boost)
 endif()
+
 set(boost_url            ${boost_prefix_url}/${boost_version}/${boost_name})
 
 set(googletest_version   1.8.1)
@@ -465,7 +474,8 @@ endif()
 # find Boost in two steps to avoid warnings 'Imported targets and dependency information not available for Boost version'
 find_package(Boost ${boost_version} QUIET)
 if(Boost_FOUND)
-  find_package(Boost ${boost_version} QUIET COMPONENTS filesystem program_options serialization system log iostreams)
+  find_package(Boost ${boost_version} QUIET COMPONENTS date_time filesystem program_options serialization system log iostreams unit_test_framework) # for libiidm-2
+  #  find_package(Boost ${boost_version} QUIET COMPONENTS        filesystem program_options serialization system log iostreams)                     # before iidm-2
 endif()
 
 if(MSVC)
@@ -521,11 +531,16 @@ else()
 
       CONFIGURE_COMMAND   <SOURCE_DIR>/bootstrap.sh
                           --without-icu
-                          --with-libraries=filesystem,program_options,serialization,system,log,iostreams
+#                          --with-libraries=filesystem,program_options,serialization,system,log,iostreams             # IIDM-legacy
+                          --with-libraries=date_time,filesystem,program_options,serialization,system,log,iostreams    # for IIDM-2
 
       BUILD_COMMAND       <SOURCE_DIR>/b2
                           -j${NUMBER_OF_PROCESSORS}
                           -sNO_BZIP2=1 cxxflags=-fPIC
+                          --with-test               # for unit_test_framework                                         # for IIDM-2
+                          --with-date_time                                                                            # for IIDM-2
+                          --with-filesystem                                                                           # for IIDM-2
+                          --with-program_options                                                                      # for IIDM-2
                           install
                           --prefix=<INSTALL_DIR>
                           $<$<BOOL:${APPLE}>:toolset=clang>
@@ -904,11 +919,6 @@ else()
   set(LIBZIP_HOME ${install_dir})
 endif()
 
-# if ( CXX11_ENABLED )                                                                              # New part for IIDM-2
-
-        # HERE IS THE NEW PART
-
-# else()                                                                                            # old part : legacy IIDM
 set(XERCESC_HOME      CACHE PATH "Path where a Xerces-C installation already exists")               # Start install XERCESC
 
 set(xercesc_version      3.2.2)
@@ -1018,9 +1028,9 @@ else()
   endif()
   ExternalProject_Get_Property(xercesc install_dir)
   set(XERCESC_HOME ${install_dir} CACHE PATH "Path to XercesC installation" FORCE)
-endif()
-                                                                                        # End install XERCESC - Start install LIBXML
-set(LIBXML_HOME ${CMAKE_INSTALL_PREFIX}/libxml)
+endif()                                                                                             # end install XERCESC
+
+set(LIBXML_HOME ${CMAKE_INSTALL_PREFIX}/libxml)                                                     # Start install LIBXML
 find_package(libXML 0.2.4 QUIET)
 unset(LIBXML_HOME)
 
@@ -1054,9 +1064,19 @@ else()
   )
   ExternalProject_Get_Property(libxml install_dir)
   set(LIBXML_HOME ${install_dir})
-endif()
-                                                                                        # End install LIBXML - Start install legacy IIDM
-set(LIBIIDM_HOME ${CMAKE_INSTALL_PREFIX}/libiidm)
+endif()                                                                                             # End install LIBXML
+
+if ( CXX11_ENABLED )  # --------------------------------------------------------------            # New part for IIDM-2
+
+  # Minimum required for powsybl that sets the rule
+  cmake_minimum_required(VERSION 3.12)
+
+  include( "${CMAKE_CURRENT_SOURCE_DIR}/libxml2/libxml2.cmake")
+  include( "${CMAKE_CURRENT_SOURCE_DIR}/libiidm/libiidm.cmake")
+
+
+else()   # ------------------------------------------------------------------------------------   # old part : legacy IIDM
+set(LIBIIDM_HOME ${CMAKE_INSTALL_PREFIX}/libiidm)                                                   # Starts install legacy LibIIDM
 find_package(libIIDM 0.2.8 QUIET)
 unset(LIBIIDM_HOME)
 
@@ -1088,6 +1108,6 @@ else()
                               -DMSVC_STATIC_RUNTIME_LIBRARY=${MSVC_STATIC_RUNTIME_LIBRARY}
   )
   ExternalProject_Get_Property(libiidm install_dir)
-  set(LIBIIDM_HOME ${install_dir})
+  set(LIBIIDM_HOME ${install_dir})                                                                  # End install legacy LibIIDM
 endif()
-                                                                                        # End install IIDM old one and DG changes
+endif ( CXX11_ENABLED )  # --------------------------------------------------------------           # end old part legacy LibIIDM

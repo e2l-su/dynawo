@@ -8,37 +8,37 @@
 #
 # This file is part of Dynawo, an hybrid C++/Modelica open source time domain simulation tool for power systems.
 
-cmake_minimum_required(VERSION 3.12)   
+cmake_minimum_required(VERSION 3.12)
 
 include($ENV{DYNAWO_HOME}/dynawo/cmake/CPUCount.cmake)
-if(NOT DEFINED CPU_COUNT ) 
-  message(FATAL_ERROR "Le décompte des CPUs a échoué")
+if(NOT DEFINED CPU_COUNT )
+  message(FATAL_ERROR "CPUCount.cmake: file not found.")
 endif()
 
 set(paquet_name        "libiidm")
-set(paquet_config_dir  "LibIIDM")  
+set(paquet_config_dir  "LibIIDM")
 set(paquet_install_dir "${CMAKE_INSTALL_PREFIX}/${paquet_name}")
 string(TOUPPER "${paquet_name}" paquet_uppername)
 set(paquet_RequiredVersion 1.2.0)
 
-set(CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/${paquet_name}/${paquet_config_dir}")       
+set(CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/${paquet_name}/${paquet_config_dir}")
 
 find_package(${paquet_name} ${paquet_RequiredVersion} EXACT QUIET CONFIG)
 if(${paquet_name}_FOUND)
 
-  add_custom_target("${paquet_name}" DEPENDS libxml2)
+  add_custom_target("${paquet_name}" DEPENDS libxml2 boost)
   message(STATUS "Found ${paquet_name} ${PACKAGE_VERSION}")
 
 else()
 
   set(paquet_git_repo    "https://github.com/powsybl/powsybl-iidm4cpp")
 
-  include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)  
+  include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
   ExternalProject_Add(
 
-                      "${paquet_name}"                                  
+                      "${paquet_name}"
 
-    DEPENDS           libxml2
+    DEPENDS           libxml2 boost
     INSTALL_DIR       "${paquet_install_dir}"
 
     GIT_REPOSITORY    "${paquet_git_repo}"
@@ -47,7 +47,7 @@ else()
 
     UPDATE_COMMAND    ""
 
-    DOWNLOAD_DIR      "${CMAKE_CURRENT_BINARY_DIR}/download_dir"          
+    DOWNLOAD_DIR      "${CMAKE_CURRENT_BINARY_DIR}/download_dir"
     TMP_DIR           "${CMAKE_CURRENT_BINARY_DIR}/tmp_dir"
     STAMP_DIR         "${CMAKE_CURRENT_BINARY_DIR}/stamp_dir"
     BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/binary_dir"
@@ -66,12 +66,13 @@ else()
                       "-DBOOST_ROOT:PATH=${BOOST_ROOT}"
                       "-DMSVC_STATIC_RUNTIME_LIBRARY=${MSVC_STATIC_RUNTIME_LIBRARY}"
 
-    BUILD_COMMAND     make -j ${CPU_COUNT} all                      
+    BUILD_COMMAND     make -j ${CPU_COUNT} all
   )
 
   unset(paquet_git_repo)
 
 endif(${paquet_name}_FOUND)
+
 unset(paquet_RequiredVersion)
 unset(paquet_upper_name)
 unset(paquet_install_dir)
