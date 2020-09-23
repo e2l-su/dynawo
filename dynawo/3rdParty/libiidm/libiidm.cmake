@@ -11,43 +11,43 @@
 cmake_minimum_required(VERSION 3.12)
 
 include($ENV{DYNAWO_HOME}/dynawo/cmake/CPUCount.cmake)
-if(NOT DEFINED CPU_COUNT )
+if(NOT DEFINED CPU_COUNT)
   message(FATAL_ERROR "CPUCount.cmake: file not found.")
 endif()
 
-set(paquet_name        "libiidm")
-set(paquet_config_dir  "LibIIDM")
-set(paquet_install_dir "${CMAKE_INSTALL_PREFIX}/${paquet_name}")
-string(TOUPPER "${paquet_name}" paquet_uppername)
-set(paquet_RequiredVersion 1.2.0)
+set(packet_name        "libiidm")
+set(packet_config_dir  "LibIIDM")
+set(packet_install_dir "${CMAKE_INSTALL_PREFIX}/${packet_name}")
+string(TOUPPER "${packet_name}" packet_uppername)
+set(packet_RequiredVersion 1.2.0)
 
-set(CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/${paquet_name}/${paquet_config_dir}")
+set(CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/${packet_name}/${packet_config_dir}")
 
-find_package(${paquet_name} ${paquet_RequiredVersion} EXACT QUIET CONFIG)
-if(${paquet_name}_FOUND)
+find_package(${packet_name} ${packet_RequiredVersion} EXACT QUIET CONFIG)
+if(${packet_name}_FOUND)
 
-  add_custom_target("${paquet_name}" DEPENDS libxml2 boost)
-  message(STATUS "Found ${paquet_name} ${PACKAGE_VERSION}")
+  add_custom_target("${packet_name}" DEPENDS libxml2 boost)
+  message(STATUS "Found ${packet_name} ${PACKAGE_VERSION}")
 
 else()
 
-  set(paquet_git_repo    "https://github.com/powsybl/powsybl-iidm4cpp")
+  set(packet_git_repo    "https://github.com/powsybl/powsybl-iidm4cpp")
 
   include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
   ExternalProject_Add(
 
-                      "${paquet_name}"
+                      "${packet_name}"
 
     DEPENDS           libxml2 boost
-    INSTALL_DIR       "${paquet_install_dir}"
+    INSTALL_DIR       "${packet_install_dir}"
 
-    GIT_REPOSITORY    "${paquet_git_repo}"
-    GIT_TAG           "v${paquet_RequiredVersion}"
+    GIT_REPOSITORY    "${packet_git_repo}"
+    GIT_TAG           "v${packet_RequiredVersion}"
     GIT_PROGRESS      1
 
     UPDATE_COMMAND    ""
 
-    DOWNLOAD_DIR      "${CMAKE_CURRENT_BINARY_DIR}/download_dir"
+    DOWNLOAD_DIR      "${CMAKE_CURRENT_SOURCE_DIR}/${packet_name}"
     TMP_DIR           "${CMAKE_CURRENT_BINARY_DIR}/tmp_dir"
     STAMP_DIR         "${CMAKE_CURRENT_BINARY_DIR}/stamp_dir"
     BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/binary_dir"
@@ -69,12 +69,12 @@ else()
     BUILD_COMMAND     make -j ${CPU_COUNT} all
   )
 
-  unset(paquet_git_repo)
+  unset(packet_git_repo)
 
-endif(${paquet_name}_FOUND)
+endif(${packet_name}_FOUND)
 
-unset(paquet_RequiredVersion)
-unset(paquet_upper_name)
-unset(paquet_install_dir)
-unset(paquet_config_dir)
-unset(paquet_name)
+unset(packet_RequiredVersion)
+unset(packet_upper_name)
+unset(packet_install_dir)
+unset(packet_config_dir)
+unset(packet_name)

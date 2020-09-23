@@ -129,12 +129,12 @@ else()
   set(boost_md5            319C6FFBBECCC366F14BB68767A6DB79)
 endif()
 
-if ( CXX11_ENABLED )  # --------------------------------------------------------------            # Start New part for IIDM-2
-  if(${boost_version} STRLESS "1.65.0")
-    set( boost_version "1.65.0")
-    set(boost_md5          d75a27ad1a34cfc7c9b5cb92594410c3)
-  endif()
-endif ( CXX11_ENABLED )  # -----------------------------------------------------------            # End New part for IIDM-2
+if ( CXX11_ENABLED )
+ if(${boost_version} STRLESS "1.65.0")
+   set( boost_version "1.65.0")
+   set(boost_md5          d75a27ad1a34cfc7c9b5cb92594410c3)
+ endif()
+endif ( CXX11_ENABLED )
 
 string(REPLACE "." "_" boost_version_ ${boost_version})
 set(boost_name           boost_${boost_version_}.tar.gz)
@@ -474,10 +474,20 @@ endif()
 # find Boost in two steps to avoid warnings 'Imported targets and dependency information not available for Boost version'
 find_package(Boost ${boost_version} QUIET)
 if(Boost_FOUND)
-  find_package(Boost ${boost_version} QUIET COMPONENTS date_time filesystem program_options serialization system log iostreams unit_test_framework) # for libiidm-2
-  #  find_package(Boost ${boost_version} QUIET COMPONENTS        filesystem program_options serialization system log iostreams)                     # before iidm-2
+  find_package(
+    Boost ${boost_version} QUIET
+    COMPONENTS                #     Dynawo      3rdParty      Powsybl
+      date_time               #                                 X
+      filesystem              #                   X             X
+      program_options         #                   X
+      serialization           #       X           X
+      system                  #                   X             X
+      log                     #       X           X
+      log_setup               #       X
+      iostreams               #                   X
+      unit_test_framework     #                                 X
+  )
 endif()
-
 if(MSVC)
   if(CMAKE_CXX_COMPILER_VERSION EQUAL 19.0.23026.0)
     GetPatchCommand(boost)
@@ -519,7 +529,8 @@ else()
       INSTALL_COMMAND     ""
     )
   else()
-    ExternalProject_Add(boost
+    ExternalProject_Add(
+                          boost
       INSTALL_DIR         ${CMAKE_INSTALL_PREFIX}/boost
       DOWNLOAD_DIR        ${CMAKE_CURRENT_SOURCE_DIR}/boost
       TMP_DIR             ${TMP_DIR}
@@ -531,16 +542,20 @@ else()
 
       CONFIGURE_COMMAND   <SOURCE_DIR>/bootstrap.sh
                           --without-icu
-#                          --with-libraries=filesystem,program_options,serialization,system,log,iostreams             # IIDM-legacy
-                          --with-libraries=date_time,filesystem,program_options,serialization,system,log,iostreams    # for IIDM-2
+                          --with-libraries=date_time,filesystem,program_options,serialization,system,log,iostreams,log_setup
+
+
 
       BUILD_COMMAND       <SOURCE_DIR>/b2
                           -j${NUMBER_OF_PROCESSORS}
-                          -sNO_BZIP2=1 cxxflags=-fPIC
-                          --with-test               # for unit_test_framework                                         # for IIDM-2
-                          --with-date_time                                                                            # for IIDM-2
-                          --with-filesystem                                                                           # for IIDM-2
-                          --with-program_options                                                                      # for IIDM-2
+                          -sNO_BZIP2=1
+                          cxxflags=-fPIC
+                          --with-test
+                          --with-date_time
+                          --with-filesystem
+                          --with-program_options
+                          --with-log
+                          --with-serialization
                           install
                           --prefix=<INSTALL_DIR>
                           $<$<BOOL:${APPLE}>:toolset=clang>
@@ -919,7 +934,7 @@ else()
   set(LIBZIP_HOME ${install_dir})
 endif()
 
-set(XERCESC_HOME      CACHE PATH "Path where a Xerces-C installation already exists")               # Start install XERCESC
+set(XERCESC_HOME      CACHE PATH "Path where a Xerces-C installation already exists")     # Start install XERCESC
 
 set(xercesc_version      3.2.2)
 set(xercesc_name         xerces-c-${xercesc_version}.tar.gz)
@@ -1028,9 +1043,9 @@ else()
   endif()
   ExternalProject_Get_Property(xercesc install_dir)
   set(XERCESC_HOME ${install_dir} CACHE PATH "Path to XercesC installation" FORCE)
-endif()                                                                                             # end install XERCESC
+endif()
 
-set(LIBXML_HOME ${CMAKE_INSTALL_PREFIX}/libxml)                                                     # Start install LIBXML
+set(LIBXML_HOME ${CMAKE_INSTALL_PREFIX}/libxml)
 find_package(libXML 0.2.4 QUIET)
 unset(LIBXML_HOME)
 
@@ -1064,19 +1079,19 @@ else()
   )
   ExternalProject_Get_Property(libxml install_dir)
   set(LIBXML_HOME ${install_dir})
-endif()                                                                                             # End install LIBXML
+endif()
 
-if ( CXX11_ENABLED )  # --------------------------------------------------------------            # New part for IIDM-2
+if ( CXX11_ENABLED )
 
-  # Minimum required for powsybl that sets the rule
-  cmake_minimum_required(VERSION 3.12)
+ # Minimum required for powsybl that sets the rule
+ cmake_minimum_required(VERSION 3.12)
 
-  include( "${CMAKE_CURRENT_SOURCE_DIR}/libxml2/libxml2.cmake")
-  include( "${CMAKE_CURRENT_SOURCE_DIR}/libiidm/libiidm.cmake")
+ include( "${CMAKE_CURRENT_SOURCE_DIR}/libxml2/libxml2.cmake")
+ include( "${CMAKE_CURRENT_SOURCE_DIR}/libiidm/libiidm.cmake")
 
 
-else()   # ------------------------------------------------------------------------------------   # old part : legacy IIDM
-set(LIBIIDM_HOME ${CMAKE_INSTALL_PREFIX}/libiidm)                                                   # Starts install legacy LibIIDM
+else()
+set(LIBIIDM_HOME ${CMAKE_INSTALL_PREFIX}/libiidm)
 find_package(libIIDM 0.2.8 QUIET)
 unset(LIBIIDM_HOME)
 
@@ -1108,6 +1123,6 @@ else()
                               -DMSVC_STATIC_RUNTIME_LIBRARY=${MSVC_STATIC_RUNTIME_LIBRARY}
   )
   ExternalProject_Get_Property(libiidm install_dir)
-  set(LIBIIDM_HOME ${install_dir})                                                                  # End install legacy LibIIDM
+  set(LIBIIDM_HOME ${install_dir})
 endif()
-endif ( CXX11_ENABLED )  # --------------------------------------------------------------           # end old part legacy LibIIDM
+endif ( CXX11_ENABLED )

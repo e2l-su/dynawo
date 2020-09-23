@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2019, RTE (http://www.rte-france.com)
+# Copyright (c) 2015-2020, RTE (http://www.rte-france.com)
 # See AUTHORS.txt
 # All rights reserved.
 # This Source Code Form is subject to the terms of the Mozilla Public
@@ -225,27 +225,19 @@ endif()
 # Tell BOOST to disable auto linking
 add_definitions(-DBOOST_ALL_NO_LIB)
 
+if ( CXX11_ENABLED )
+  set( Boost_RequiredVersion  "1.65")
+else ()
+  set( Boost_RequiredVersion  "1.64")
+endif ()
 if(CMAKE_BUILD_TYPE STREQUAL "Tests" OR CMAKE_BUILD_TYPE STREQUAL "TestCoverage")
-  find_package(Boost 1.64 REQUIRED
-          COMPONENTS
-          filesystem
-          program_options
-          serialization
-          system
-          log
-          log_setup
-          iostreams
-          )
+  find_package(Boost "${Boost_RequiredVersion}" REQUIRED
+    COMPONENTS filesystem program_options serialization system log log_setup iostreams
+  )
 else()
-  find_package(Boost 1.64 REQUIRED
-          COMPONENTS
-          filesystem
-          program_options
-          serialization
-          system
-          log
-          log_setup
-          )
+  find_package(Boost "${Boost_RequiredVersion}" REQUIRED
+    COMPONENTS filesystem program_options serialization system log log_setup
+  )
 endif()
 
 set(BUILD_TESTS ${BUILD_TESTS} CACHE BOOL "Build tests.")
@@ -309,8 +301,7 @@ if(MSVC)
   endif()
 endif()
 find_package(ZLIB 1.2.3 REQUIRED)
-set_property(TARGET ZLIB::ZLIB APPEND PROPERTY
-  IMPORTED_LOCATION "${ZLIB_LIBRARY}")
+set_property(TARGET ZLIB::ZLIB APPEND PROPERTY IMPORTED_LOCATION "${ZLIB_LIBRARY}")
 
 if(MSVC)
   if(LIBRARY_TYPE STREQUAL "STATIC")
@@ -346,7 +337,12 @@ endif()
 find_package(libXML 0.2.4 REQUIRED PATHS ${LIBXML_HOME})
 
 # libIIDM
-find_package(libIIDM 0.2.8 REQUIRED PATHS ${LIBIIDM_HOME}
+if ( CXX11_ENABLED )
+  set( libIIDM_RequiredVersion  "1.2.0")
+else ()
+  set( libIIDM_RequiredVersion  "0.2.8")
+endif ()
+find_package(libIIDM "${libIIDM_RequiredVersion}" REQUIRED PATHS ${LIBIIDM_HOME}
   COMPONENTS
     core
     xml
@@ -372,7 +368,7 @@ find_package(libIIDM 0.2.8 REQUIRED PATHS ${LIBIIDM_HOME}
     ext-loaddetail-xml
     ext-standbyautomaton
     ext-standbyautomaton-xml
-  )
+)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sources/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/sources/config.h @ONLY)
 
@@ -381,7 +377,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sources/config.h.in ${CMAKE_CURRENT_S
 #
 add_custom_target(CREATE_DDBDIR
   COMMAND ${CMAKE_COMMAND} -E make_directory ${ddbdir}
-  )
+)
 
 if(MSVC)
   set(runtime_PATH "PATH=${ADEPT_HOME}/bin;${Boost_INCLUDE_DIR}/../lib;${dlfcn-win32_INCLUDE_DIRS}/../bin;${INSTALL_OPENMODELICA}/bin;${SUITESPARSE_HOME}/bin;${SUNDIALS_HOME}/lib;${XercesC_INCLUDE_DIRS}/../bin;${LibIIDM_BIN_DIR};${LibXML_BIN_DIR};${libdir};$ENV{PATH}")
@@ -420,10 +416,7 @@ write_basic_package_version_file(
   COMPATIBILITY AnyNewerVersion
 )
 
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/dynawo-config-version.cmake
-  DESTINATION ${SHAREDIR_NAME}
-)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dynawo-config-version.cmake DESTINATION ${SHAREDIR_NAME})
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindAdept.cmake DESTINATION ${SHAREDIR_NAME}/cmake)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindLibArchive.cmake DESTINATION ${SHAREDIR_NAME}/cmake)
@@ -435,6 +428,8 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindlibZIP.cmake DESTINATION ${S
 
 if(MSVC)
   if(CMAKE_BUILD_TYPE STREQUAL "Tests" OR CMAKE_BUILD_TYPE STREQUAL "TestCoverage")
-    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel (CMake defaults)" FORCE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+      "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel (CMake defaults)" FORCE
+    )
   endif()
 endif()
