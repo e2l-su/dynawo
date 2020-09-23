@@ -339,6 +339,7 @@ find_package(libXML 0.2.4 REQUIRED PATHS ${LIBXML_HOME})
 # libIIDM
 if ( CXX11_ENABLED )
   set( libIIDM_RequiredVersion  "1.2.0")
+  find_package( LibXml2 REQUIRED)
 else ()
   set( libIIDM_RequiredVersion  "0.2.8")
 endif ()
