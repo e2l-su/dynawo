@@ -552,12 +552,6 @@ else()
                           -j${NUMBER_OF_PROCESSORS}
                           -sNO_BZIP2=1
                           cxxflags=-fPIC
-                          --with-test
-                          --with-date_time
-                          --with-filesystem
-                          --with-program_options
-                          --with-log
-                          --with-serialization
                           install
                           --prefix=<INSTALL_DIR>
                           $<$<BOOL:${APPLE}>:toolset=clang>
