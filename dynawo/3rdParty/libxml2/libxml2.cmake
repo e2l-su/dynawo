@@ -15,52 +15,51 @@ if(NOT DEFINED CPU_COUNT)
   message(FATAL_ERROR "CPUCount.cmake: file not found.")
 endif()
 
-set(packet_name        "libxml2")
-set(packet_finder      "LibXml2")
-set(packet_install_dir "${CMAKE_INSTALL_PREFIX}/${packet_name}")
-set(packet_RequiredVersion 2.9)
-string(TOUPPER "${packet_name}" packet_uppername)
+set(package_name       "libxml2")
+set(package_finder     "LibXml2")
+set(package_install_dir  "${CMAKE_INSTALL_PREFIX}/${package_name}")
+set(package_RequiredVersion 2.9)
+string(TOUPPER "${package_name}" package_uppername)
 
 unset(CMAKE_MODULE_PATH)
-if(IS_DIRECTORY "$ENV{DYNAWO_HOME}/dynawo/3rdParty/${packet_name}")
-  list(APPEND CMAKE_MODULE_PATH "$ENV{DYNAWO_HOME}/dynawo/3rdParty/${packet_name}")
+if(IS_DIRECTORY "$ENV{DYNAWO_HOME}/dynawo/3rdParty/${package_name}")
+  list(APPEND CMAKE_MODULE_PATH "$ENV{DYNAWO_HOME}/dynawo/3rdParty/${package_name}")
 endif()
 list(APPEND CMAKE_MODULE_PATH "$ENV{DYNAWO_HOME}/dynawo/cmake")
 
-set(CMAKE_PREFIX_PATH "${packet_install_dir}")
-find_package("${packet_finder}" "${packet_RequiredVersion}" QUIET)
-if(${packet_finder}_FOUND)
+set(CMAKE_PREFIX_PATH "${package_install_dir}")
+find_package("${package_finder}" "${package_RequiredVersion}" QUIET)
 
-  message(STATUS "Found ${packet_name} ${${packet_uppername}_VERSION_STRING}"
-                 " - lib: ${${packet_uppername}_LIBRARY} - include_dir: ${${packet_uppername}_INCLUDE_DIR}"
+if(${package_finder}_FOUND)
+  message(STATUS "Found ${package_name} ${${package_uppername}_VERSION_STRING}"
+                 " - lib: ${${package_uppername}_LIBRARY} - include_dir: ${${package_uppername}_INCLUDE_DIR}"
   )
-  add_custom_target("${packet_name}")
+  add_custom_target("${package_name}")
 
 else()
-
-  set(packet_VersionToInstall 2.9.4)
-  set(packet_md5   85235a3961e6f02b6af8774e33eaa1f2)
+  set(package_VersionToInstall 2.9.4)
+  set(package_md5    85235a3961e6f02b6af8774e33eaa1f2)
 
   if(DEFINED $ENV{DYNAWO_LIBXML2_DOWNLOAD_URL})
-    set(packet_prefix_url $ENV{DYNAWO_LIBXML2_DOWNLOAD_URL})
+    set(package_prefix_url $ENV{DYNAWO_LIBXML2_DOWNLOAD_URL})
   else()
-    set(packet_prefix_url http://www.github.com/GNOME/libxml2/archive)
+    set(package_prefix_url http://www.github.com/GNOME/libxml2/archive)
   endif()
-  set(packet_url   "${packet_prefix_url}/v${packet_VersionToInstall}.tar.gz")
+  set(package_url  "${package_prefix_url}/v${package_VersionToInstall}.tar.gz")
 
   include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
   ExternalProject_Add(
-                        "${packet_name}"
+                        "${package_name}"
 
-    INSTALL_DIR         ${packet_install_dir}
+    INSTALL_DIR         ${package_install_dir}
 
-    DOWNLOAD_DIR        ${CMAKE_CURRENT_SOURCE_DIR}/${packet_name}
+    DOWNLOAD_DIR        ${CMAKE_CURRENT_SOURCE_DIR}/${package_name}
     TMP_DIR             ${CMAKE_CURRENT_BINARY_DIR}/tmp_dir
     STAMP_DIR           ${CMAKE_CURRENT_BINARY_DIR}/stamp_dir
     SOURCE_DIR          ${CMAKE_CURRENT_BINARY_DIR}/source_dir
 
-    URL                 ${packet_url}
-    URL_MD5             ${packet_md5}
+    URL                 ${package_url}
+    URL_MD5             ${package_md5}
 
     BUILD_IN_SOURCE     1
 
@@ -77,18 +76,18 @@ else()
     BUILD_COMMAND   make -j ${CPU_COUNT} all
   )
 
-  set(LIBXML2_LIBRARY      "${packet_install_dir}/lib/${packet_name}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-  set(LIBXML2_INCLUDE_DIR  "${packet_install_dir}/include/${packet_name}")
+  set(LIBXML2_LIBRARY      "${package_install_dir}/lib/${package_name}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  set(LIBXML2_INCLUDE_DIR  "${package_install_dir}/include/${package_name}")
 
-  unset(packet_url)
-  unset(packet_prefix_url)
-  unset(packet_md5)
-  unset(packet_VersionToInstall)
+  unset(package_url)
+  unset(package_prefix_url)
+  unset(package_md5)
+  unset(package_VersionToInstall)
 
-endif(${packet_finder}_FOUND)
+endif(${package_finder}_FOUND)
 
-unset(packet_uppername)
-unset(packet_RequiredVersion)
-unset(packet_install_dir)
-unset(packet_finder)
-unset(packet_name)
+unset(package_uppername)
+unset(package_RequiredVersion)
+unset(package_install_dir)
+unset(package_finder)
+unset(package_name)

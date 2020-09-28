@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2020, RTE (http://www.rte-france.com)
+# Copyright (c) 2015-2019, RTE (http://www.rte-france.com)
 # See AUTHORS.txt
 # All rights reserved.
 # This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,8 +27,8 @@ if(MSVC_STATIC_RUNTIME_LIBRARY)
   set(Boost_USE_STATIC_RUNTIME ON)
 endif()
 
-if (APPLE)
-  if (NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
+if(APPLE)
+  if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
     set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Variable to specify -mmacosx-version-min flag.")
   endif()
 endif()
@@ -129,12 +129,12 @@ else()
   set(boost_md5            319C6FFBBECCC366F14BB68767A6DB79)
 endif()
 
-if ( CXX11_ENABLED )
+if(CXX11_ENABLED)
  if(${boost_version} STRLESS "1.65.0")
-   set( boost_version "1.65.0")
+   set(boost_version "1.65.0")
    set(boost_md5          d75a27ad1a34cfc7c9b5cb92594410c3)
  endif()
-endif ( CXX11_ENABLED )
+endif(CXX11_ENABLED)
 
 string(REPLACE "." "_" boost_version_ ${boost_version})
 set(boost_name           boost_${boost_version_}.tar.gz)
@@ -239,7 +239,7 @@ function(GetPatchCommand projectName)
   endif()
   set(commonPatchFile "${CMAKE_CURRENT_SOURCE_DIR}/${projectName}/patch/common/${projectName}.patch")
   if(EXISTS ${commonPatchFile})
-    if (UNIX)
+    if(UNIX)
       set(commonPatchCommand patch -p1 --forward --no-backup-if-mismatch -r ${nullFile} -i ${commonPatchFile} || echo -n)
     else()
       set(commonPatchCommand git apply -p1 ${commonPatchFile} --reverse --check 2> ${nullFile} || git apply --ignore-whitespace --whitespace=nowarn -p1 ${commonPatchFile})
@@ -247,7 +247,7 @@ function(GetPatchCommand projectName)
   endif()
   set(compilerPatchFile "${CMAKE_CURRENT_SOURCE_DIR}/${projectName}/patch/${CMAKE_CXX_COMPILER_ID}/${projectName}.patch")
   if(EXISTS ${compilerPatchFile})
-    if (UNIX)
+    if(UNIX)
       set(compilerPatchCommand patch -p1 --forward --no-backup-if-mismatch -r ${nullFile} -i ${compilerPatchFile} || echo -n)
     else()
       set(compilerPatchCommand git apply -p1 ${compilerPatchFile} --reverse --check 2> ${nullFile} || git apply --ignore-whitespace --whitespace=nowarn -p1 ${compilerPatchFile})
@@ -544,8 +544,6 @@ else()
                           --without-icu
                           --with-libraries=date_time,filesystem,program_options,serialization,system,log,iostreams,log_setup
 
-
-
       BUILD_COMMAND       <SOURCE_DIR>/b2
                           -j${NUMBER_OF_PROCESSORS}
                           -sNO_BZIP2=1
@@ -669,7 +667,7 @@ else()
 endif()
 
 if(UNIX)
-  if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/nicslu/_nicslu301.zip")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/nicslu/_nicslu301.zip")
     set(NICSLU_HOME ${CMAKE_INSTALL_PREFIX}/nicslu)
     find_package(NICSLU QUIET)
     if(NICSLU_FOUND)
@@ -755,7 +753,6 @@ else()
   ExternalProject_Get_Property(sundials install_dir)
   set(SUNDIALS_HOME ${install_dir})
 endif()
-
 
 GetPatchCommand(dlfcnwin32)
 if(MSVC)
@@ -1081,14 +1078,11 @@ else()
   set(LIBXML_HOME ${install_dir})
 endif()
 
-if ( CXX11_ENABLED )
-
- # Minimum required for powsybl that sets the rule
+if(CXX11_ENABLED)
  cmake_minimum_required(VERSION 3.12)
 
- include( "${CMAKE_CURRENT_SOURCE_DIR}/libxml2/libxml2.cmake")
- include( "${CMAKE_CURRENT_SOURCE_DIR}/libiidm/libiidm.cmake")
-
+ include("${CMAKE_CURRENT_SOURCE_DIR}/libxml2/libxml2.cmake")
+ include("${CMAKE_CURRENT_SOURCE_DIR}/libiidm/libiidm.cmake")
 
 else()
 set(LIBIIDM_HOME ${CMAKE_INSTALL_PREFIX}/libiidm)
@@ -1125,4 +1119,4 @@ else()
   ExternalProject_Get_Property(libiidm install_dir)
   set(LIBIIDM_HOME ${install_dir})
 endif()
-endif ( CXX11_ENABLED )
+endif(CXX11_ENABLED)

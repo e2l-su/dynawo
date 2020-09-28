@@ -16,6 +16,7 @@ function(SetPatchCommands projectName)
   endif()
 
   set(PatchFile "${TmpDirName}/${projectName}/patch/common/${projectName}.patch")
+  if(EXISTS ${PatchFile})
     if(UNIX)
       set(paquet_all_comp_patch
         patch -p1 --forward --no-backup-if-mismatch -r /dev/null -i ${PatchFile} || echo -n
@@ -36,6 +37,7 @@ function(SetPatchCommands projectName)
   endif()
 
   set(PatchFile "${TmpDirName}/${projectName}/patch/${CMAKE_CXX_COMPILER_ID}/${projectName}.patch")
+  if(EXISTS ${PatchFile})
     if(UNIX)
       set(paquet_compiler_patch
         patch -p1 --forward --no-backup-if-mismatch -r /dev/null -i ${PatchFile} || echo -n

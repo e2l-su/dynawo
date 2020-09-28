@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2020, RTE (http://www.rte-france.com)
+# Copyright (c) 2015-2019, RTE (http://www.rte-france.com)
 # See AUTHORS.txt
 # All rights reserved.
 # This Source Code Form is subject to the terms of the Mozilla Public
@@ -225,11 +225,11 @@ endif()
 # Tell BOOST to disable auto linking
 add_definitions(-DBOOST_ALL_NO_LIB)
 
-if ( CXX11_ENABLED )
-  set( Boost_RequiredVersion  "1.65")
-else ()
-  set( Boost_RequiredVersion  "1.64")
-endif ()
+if(CXX11_ENABLED)
+  set(Boost_RequiredVersion  "1.65")
+else()
+  set(Boost_RequiredVersion  "1.64")
+endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Tests" OR CMAKE_BUILD_TYPE STREQUAL "TestCoverage")
   find_package(Boost "${Boost_RequiredVersion}" REQUIRED
     COMPONENTS filesystem program_options serialization system log log_setup iostreams
@@ -337,39 +337,37 @@ endif()
 find_package(libXML 0.2.4 REQUIRED PATHS ${LIBXML_HOME})
 
 # libIIDM
-if ( CXX11_ENABLED )
-  set( libIIDM_RequiredVersion  "1.2.0")
-  find_package( LibXml2 REQUIRED)
-else ()
-  set( libIIDM_RequiredVersion  "0.2.8")
-endif ()
-find_package(libIIDM "${libIIDM_RequiredVersion}" REQUIRED PATHS ${LIBIIDM_HOME}
-  COMPONENTS
-    core
-    xml
-    ext-activeseason
-    ext-activeseason-xml
-    ext-busbarsectionposition
-    ext-busbarsectionposition-xml
-    ext-connectableposition
-    ext-connectableposition-xml
-    ext-currentlimitsperseason
-    ext-currentlimitsperseason-xml
-    ext-generatoractivepowercontrol
-    ext-generatoractivepowercontrol-xml
-    ext-hvdcangledroopactivepowercontrol
-    ext-hvdcangledroopactivepowercontrol-xml
-    ext-hvdcoperatoractivepowerrange
-    ext-hvdcoperatoractivepowerrange-xml
-    ext-generatorentsoecategory
-    ext-generatorentsoecategory-xml
-    ext-generatorstartup
-    ext-generatorstartup-xml
-    ext-loaddetail
-    ext-loaddetail-xml
-    ext-standbyautomaton
-    ext-standbyautomaton-xml
-)
+if(CXX11_ENABLED)
+  find_package(LibIIDM "1.2.0" REQUIRED PATHS ${LIBIIDM_HOME})
+else()
+  find_package(libIIDM "0.2.8" REQUIRED PATHS ${LIBIIDM_HOME}
+    COMPONENTS
+      core
+      xml
+      ext-activeseason
+      ext-activeseason-xml
+      ext-busbarsectionposition
+      ext-busbarsectionposition-xml
+      ext-connectableposition
+      ext-connectableposition-xml
+      ext-currentlimitsperseason
+      ext-currentlimitsperseason-xml
+      ext-generatoractivepowercontrol
+      ext-generatoractivepowercontrol-xml
+      ext-hvdcangledroopactivepowercontrol
+      ext-hvdcangledroopactivepowercontrol-xml
+      ext-hvdcoperatoractivepowerrange
+      ext-hvdcoperatoractivepowerrange-xml
+      ext-generatorentsoecategory
+      ext-generatorentsoecategory-xml
+      ext-generatorstartup
+      ext-generatorstartup-xml
+      ext-loaddetail
+      ext-loaddetail-xml
+      ext-standbyautomaton
+      ext-standbyautomaton-xml
+  )
+endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sources/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/sources/config.h @ONLY)
 
@@ -417,7 +415,10 @@ write_basic_package_version_file(
   COMPATIBILITY AnyNewerVersion
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dynawo-config-version.cmake DESTINATION ${SHAREDIR_NAME})
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/dynawo-config-version.cmake
+  DESTINATION ${SHAREDIR_NAME}
+)
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindAdept.cmake DESTINATION ${SHAREDIR_NAME}/cmake)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindLibArchive.cmake DESTINATION ${SHAREDIR_NAME}/cmake)
