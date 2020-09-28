@@ -55,6 +55,7 @@ if(DEFINED DYNAWO_THIRD_PARTY_DIR)
   set(ZLIB_ROOT ${DYNAWO_THIRD_PARTY_DIR}/zlib CACHE PATH "Path where a ZLib installation already exists")
   set(XERCESC_HOME ${DYNAWO_THIRD_PARTY_DIR}/xerces-c CACHE PATH "Path where a Xerces-c installation already exists")
   set(NICSLU_HOME ${DYNAWO_THIRD_PARTY_DIR}/nicslu CACHE PATH "Path where a Nicslu installation already exists")
+  set(LIBXML2_HOME ${DYNAWO_THIRD_PARTY_DIR}/libxml2 CACHE PATH "Path where libxml2 installation already exists")
 endif()
 
 get_filename_component(DYNAWO_HOME ${DYNAWO_HOME} ABSOLUTE)
@@ -338,6 +339,7 @@ find_package(libXML 0.2.4 REQUIRED PATHS ${LIBXML_HOME})
 
 # libIIDM
 if(CXX11_ENABLED)
+  find_package(LibXml2 REQUIRED PATHS ${LIBXML2_HOME})
   find_package(LibIIDM "1.2.0" REQUIRED PATHS ${LIBIIDM_HOME})
 else()
   find_package(libIIDM "0.2.8" REQUIRED PATHS ${LIBIIDM_HOME}
@@ -384,7 +386,7 @@ if(MSVC)
     set(runtime_tests_PATH "PATH=${GTEST_ROOT}/bin;${ADEPT_HOME}/bin;${Boost_INCLUDE_DIR}/../lib;${dlfcn-win32_INCLUDE_DIRS}/../bin;${INSTALL_OPENMODELICA}/bin;${SUITESPARSE_HOME}/bin;${SUNDIALS_HOME}/lib;${XercesC_INCLUDE_DIRS}/../bin;${LibIIDM_BIN_DIR};${LibXML_BIN_DIR};${libdir};$ENV{PATH}")
   endif()
 else() # Linux
-  set(runtime_LD_LIBRARY_PATH "LD_LIBRARY_PATH=${ADEPT_HOME}/lib:${SUITESPARSE_HOME}/lib:${SUNDIALS_HOME}/lib64:${SUNDIALS_HOME}/lib:${XercesC_INCLUDE_DIRS}/../lib:${LibIIDM_LIB_DIR}:${LibXML_LIB_DIR}:${libdir}:${Boost_INCLUDE_DIR}/../lib:$ENV{LD_LIBRARY_PATH}")
+  set(runtime_LD_LIBRARY_PATH "LD_LIBRARY_PATH=${ADEPT_HOME}/lib:${SUITESPARSE_HOME}/lib:${SUNDIALS_HOME}/lib64:${SUNDIALS_HOME}/lib:${XercesC_INCLUDE_DIRS}/../lib:${LibIIDM_LIB_DIR}:${LibXML_LIB_DIR}:${libdir}:${Boost_INCLUDE_DIR}/../lib:${LIBXML2_HOME}/lib:$ENV{LD_LIBRARY_PATH}")
   set(runtime_PATH "PATH=${INSTALL_OPENMODELICA}/bin:$ENV{PATH}")
 endif()
 

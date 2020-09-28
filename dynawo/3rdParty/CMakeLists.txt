@@ -473,20 +473,18 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 # find Boost in two steps to avoid warnings 'Imported targets and dependency information not available for Boost version'
 find_package(Boost ${boost_version} QUIET)
+
 if(Boost_FOUND)
-  find_package(
-    Boost ${boost_version} QUIET
-    COMPONENTS                #     Dynawo      3rdParty      Powsybl
-      date_time               #                                 X
-      filesystem              #                   X             X
-      program_options         #                   X
-      serialization           #       X           X
-      system                  #                   X             X
-      log                     #       X           X
-      log_setup               #       X
-      iostreams               #                   X
-      unit_test_framework     #                                 X
-  )
+  if(CXX11_ENABLED)
+    find_package(Boost ${boost_version} QUIET
+      COMPONENTS date_time filesystem program_options serialization system log iostreams unit_test_framework
+    )
+  else()
+    find_package(Boost ${boost_version} QUIET
+      COMPONENTS filesystem program_options serialization system log iostreams
+    )
+  endif()
+
 endif()
 if(MSVC)
   if(CMAKE_CXX_COMPILER_VERSION EQUAL 19.0.23026.0)
@@ -528,9 +526,15 @@ else()
 
       INSTALL_COMMAND     ""
     )
+
   else()
-    ExternalProject_Add(
-                          boost
+    if(CXX11_ENABLED)
+      set(TmpVar "--with-libraries=date_time,filesystem,program_options,serialization,system,log,iostreams,log_setup")
+    else()
+      set(TmpVar "--with-libraries=filesystem,program_options,serialization,system,log,iostreams")
+    endif()
+
+    ExternalProject_Add(boost
       INSTALL_DIR         ${CMAKE_INSTALL_PREFIX}/boost
       DOWNLOAD_DIR        ${CMAKE_CURRENT_SOURCE_DIR}/boost
       TMP_DIR             ${TMP_DIR}
@@ -542,7 +546,7 @@ else()
 
       CONFIGURE_COMMAND   <SOURCE_DIR>/bootstrap.sh
                           --without-icu
-                          --with-libraries=date_time,filesystem,program_options,serialization,system,log,iostreams,log_setup
+                          ${TmpVar}
 
       BUILD_COMMAND       <SOURCE_DIR>/b2
                           -j${NUMBER_OF_PROCESSORS}
@@ -564,6 +568,7 @@ else()
 
       INSTALL_COMMAND     ""
     )
+    unset(TmpVar)
   endif()
   if(APPLE)
     ExternalProject_Add_Step(boost install-macos
