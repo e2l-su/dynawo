@@ -529,7 +529,7 @@ else()
 
   else()
     if(CXX11_ENABLED)
-      set(TmpVar "--with-libraries=date_time,filesystem,program_options,serialization,system,log,iostreams,log_setup")
+      set(TmpVar "--with-libraries=date_time,filesystem,program_options,serialization,system,log,iostreams,unit_test_framework")
     else()
       set(TmpVar "--with-libraries=filesystem,program_options,serialization,system,log,iostreams")
     endif()
