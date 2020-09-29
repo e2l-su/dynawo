@@ -338,8 +338,9 @@ endif()
 find_package(libXML 0.2.4 REQUIRED PATHS ${LIBXML_HOME})
 
 # libIIDM
+
 if(CXX11_ENABLED)
-  find_package(LibXml2 REQUIRED PATHS ${LIBXML2_HOME})
+  find_package(LibXml2 "2.9" REQUIRED)
   find_package(LibIIDM "1.2.0" REQUIRED PATHS ${LIBIIDM_HOME})
 else()
   find_package(libIIDM "0.2.8" REQUIRED PATHS ${LIBIIDM_HOME}
