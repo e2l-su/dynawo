@@ -87,11 +87,13 @@ set(OPENMODELICA_VERSION "1_13_2" CACHE STRING "Version of OpenModelica")
 # If C++11 is enabled, check flags availability
 set(CXX11_ENABLED ON CACHE BOOL "")
 
+list(APPEND CMAKE_PREFIX_PATH "${LIBXML2_HOME}")
+
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -D_WIN32_WINNT=0x0601)
   add_definitions(-DLANG_CXX11)
 
-  set(CMAKE_PREFIX_PATH ${DYNAWO_THIRD_PARTY_DIR}/dlfcnwin32)
+  list(APPEND CMAKE_PREFIX_PATH "${DYNAWO_THIRD_PARTY_DIR}/dlfcnwin32")
 
   find_package(dlfcn-win32 REQUIRED)
   set(CMAKE_DL_LIBS dlfcn-win32::dl)

@@ -57,6 +57,7 @@ else()
     CMAKE_ARGS        "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
                       "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
                       "-DBOOST_ROOT:PATH=${BOOST_ROOT}"
+                      "-DCMAKE_PREFIX_PATH=${LIBXML2_HOME}"
                       "-DMSVC_STATIC_RUNTIME_LIBRARY=${MSVC_STATIC_RUNTIME_LIBRARY}"
 
     BUILD_COMMAND     make -j ${CPU_COUNT} all

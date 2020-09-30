@@ -22,6 +22,8 @@ if(IS_DIRECTORY "$ENV{DYNAWO_HOME}/dynawo/3rdParty/${package_name}")
 endif()
 list(APPEND CMAKE_MODULE_PATH "$ENV{DYNAWO_HOME}/dynawo/cmake")
 
+list(APPEND CMAKE_PREFIX_PATH "${LIBXML2_HOME}")
+
 set(CMAKE_PREFIX_PATH "${package_install_dir}")
 find_package("${package_finder}" "${package_RequiredVersion}" QUIET)
 
@@ -30,6 +32,7 @@ if(${package_finder}_FOUND)
                  " - lib: ${${package_uppername}_LIBRARY} - include_dir: ${${package_uppername}_INCLUDE_DIR}"
   )
   add_custom_target("${package_name}")
+  set(LIBXML2_HOME ${CMAKE_INSTALL_PREFIX}/libxml2)
 
 else()
   include($ENV{DYNAWO_HOME}/dynawo/cmake/CPUCount.cmake)
@@ -76,8 +79,8 @@ else()
     BUILD_COMMAND   make -j ${CPU_COUNT} all
   )
 
-  set(LIBXML2_LIBRARY      "${package_install_dir}/lib/${package_name}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-  set(LIBXML2_INCLUDE_DIR  "${package_install_dir}/include/${package_name}")
+  ExternalProject_Get_Property(libxml2 install_dir)
+  set(LIBXML2_HOME ${install_dir})
 
   unset(package_url)
   unset(package_prefix_url)

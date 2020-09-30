@@ -66,6 +66,7 @@ set(BOOST_ROOT        CACHE PATH "Path where a Boost installation already exists
 set(GTEST_ROOT        CACHE PATH "Path where a GoogleTest installation already exists")
 set(LIBARCHIVE_HOME   CACHE PATH "Path where a LibArchive installation already exists")
 set(ZLIB_ROOT         CACHE PATH "Path where a ZLib installation already exists")
+set(LIBXML2_HOME      CACHE PATH "Path where a libxml2 installation already exists")
 
 if(NOT MSVC)
   # check if c++11 can be enabled
