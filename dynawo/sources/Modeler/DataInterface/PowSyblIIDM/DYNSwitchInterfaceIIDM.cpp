@@ -18,9 +18,8 @@
  *
  */
 #include <powsybl/iidm/Switch.hpp>
-
-#include "DYNModelConstants.h"
 #include "DYNSwitchInterfaceIIDM.h"
+#include "DYNModelConstants.h"
 
 using boost::shared_ptr;
 

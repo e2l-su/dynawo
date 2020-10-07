@@ -134,7 +134,7 @@ double
 LineInterfaceIIDM::getP1() {
   double P = 0;
   if (getInitialConnected1()) {
-    if (!std::isnan(lineIIDM_.getTerminal1().getP())) {
+    if (std::isnan(lineIIDM_.getTerminal1().getP())) {
       Trace::warn("DATAINTERFACE") << DYNLog(VariableNotSet, "line", lineIIDM_.getId(), "P1") << Trace::endline;
     } else {
       P = lineIIDM_.getTerminal1().getP();
@@ -147,7 +147,7 @@ double
 LineInterfaceIIDM::getQ1() {
   double Q = 0;
   if (getInitialConnected1()) {
-    if (!std::isnan(lineIIDM_.getTerminal1().getQ())) {
+    if (std::isnan(lineIIDM_.getTerminal1().getQ())) {
       Trace::warn("DATAINTERFACE") << DYNLog(VariableNotSet, "line", lineIIDM_.getId(), "Q1") << Trace::endline;
     } else {
       Q = lineIIDM_.getTerminal1().getQ();
@@ -160,7 +160,7 @@ double
 LineInterfaceIIDM::getP2() {
   double P = 0;
   if (getInitialConnected2()) {
-    if (!std::isnan(lineIIDM_.getTerminal2().getP())) {
+    if (std::isnan(lineIIDM_.getTerminal2().getP())) {
       Trace::warn("DATAINTERFACE") << DYNLog(VariableNotSet, "line", lineIIDM_.getId(), "P2") << Trace::endline;
     } else {
       P = lineIIDM_.getTerminal2().getP();
@@ -173,7 +173,7 @@ double
 LineInterfaceIIDM::getQ2() {
   double Q = 0;
   if (getInitialConnected2()) {
-    if (!std::isnan(lineIIDM_.getTerminal2().getQ())) {
+    if (std::isnan(lineIIDM_.getTerminal2().getQ())) {
       Trace::warn("DATAINTERFACE") << DYNLog(VariableNotSet, "line", lineIIDM_.getId(), "Q2") << Trace::endline;
     } else {
       Q = lineIIDM_.getTerminal2().getQ();

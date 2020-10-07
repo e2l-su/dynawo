@@ -20,13 +20,10 @@
 #ifndef MODELER_DATAINTERFACE_POWSYBLIIDM_DYNBUSINTERFACEIIDM_H_
 #define MODELER_DATAINTERFACE_POWSYBLIIDM_DYNBUSINTERFACEIIDM_H_
 
+#include <powsybl/iidm/Bus.hpp>
 #include <boost/optional.hpp>
 
 #include "DYNBusInterface.h"
-
-namespace powsybl::iidm {
-class Bus;
-}
 
 namespace DYN {
 

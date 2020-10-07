@@ -20,13 +20,10 @@
 #ifndef MODELER_DATAINTERFACE_POWSYBLIIDM_DYNLINEINTERFACEIIDM_H_
 #define MODELER_DATAINTERFACE_POWSYBLIIDM_DYNLINEINTERFACEIIDM_H_
 
+#include <powsybl/iidm/Line.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "DYNLineInterface.h"
-
-namespace powsybl::iidm {
-class Line;
-}
 
 namespace DYN {
 

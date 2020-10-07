@@ -105,7 +105,7 @@ class SwitchInterfaceIIDM : public SwitchInterface {
   powsybl::iidm::Switch& switchIIDM_;              ///< reference to the iidm switch instance
   boost::shared_ptr<BusInterface> busInterface1_;  ///< busInterface of the bus where the side 1 of the switch is connected
   boost::shared_ptr<BusInterface> busInterface2_;  ///< busInterface of the bus where the side 2 of the switch is connected
-};                                                 ///< class switch interface so Dynawo may use powsybl::iidm::Switch
+};                                                 ///< class for switch model interface
 }  // namespace DYN
 
 #endif  // MODELER_DATAINTERFACE_POWSYBLIIDM_DYNSWITCHINTERFACEIIDM_H_
