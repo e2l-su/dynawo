@@ -18,7 +18,7 @@ set(DATA_INTERFACE_IIDM_SOURCES
    DYNBusInterfaceIIDM.cpp
 #   DYNCalculatedBusInterfaceIIDM.cpp
    DYNSwitchInterfaceIIDM.cpp
-#-   DYNLineInterfaceIIDM.cpp
+   DYNLineInterfaceIIDM.cpp
 #   DYNTwoWTransformerInterfaceIIDM.cpp
 #   DYNThreeWTransformerInterfaceIIDM.cpp
 #-   DYNLoadInterfaceIIDM.cpp
@@ -40,6 +40,9 @@ set(DATA_INTERFACE_IIDM_SOURCES
 
 
 set(DATA_INTERFACE_IIDM_INCLUDE_HEADERS
+   DYNBusInterfaceIIDM.h
+   DYNLineInterfaceIIDM.h
+   DYNSwitchInterfaceIIDM.h
     )
 
 add_library(dynawo_DataInterfaceIIDM ${LIBRARY_TYPE} ${DATA_INTERFACE_IIDM_SOURCES})

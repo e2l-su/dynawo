@@ -27,26 +27,22 @@ using powsybl::iidm::VoltageLevel;
 
 namespace DYN {
 
-TEST(DataInterfaceTest, testSwitchInterface_1) {
+TEST(DataInterfaceTest, Switch) {
   Network network("test", "test");
 
   Substation& s = network.newSubstation()
-                       .setId("S")
-                       .add();
+                      .setId("S")
+                      .add();
 
   VoltageLevel& vl1 = s.newVoltageLevel()
-                       .setId("VL1")
-                       .setNominalVoltage(400.)
-                       .setTopologyKind(TopologyKind::BUS_BREAKER)
-                       .setHighVoltageLimit(420.)
-                       .setLowVoltageLimit(380.)
-                       .add();
+                          .setId("VL1")
+                          .setNominalVoltage(400.)
+                          .setTopologyKind(TopologyKind::BUS_BREAKER)
+                          .setHighVoltageLimit(420.)
+                          .setLowVoltageLimit(380.)
+                          .add();
 
-  auto swAdder = vl1.getBusBreakerView().newSwitch()
-                       .setId("Sw")
-                       .setName("SwName")
-                       .setFictitious(false)
-                       .setOpen(false);
+  auto swAdder = vl1.getBusBreakerView().newSwitch().setId("Sw").setName("SwName").setFictitious(false);
 
   powsybl::iidm::Bus& b1 = vl1.getBusBreakerView().newBus().setId("BUS1").add();
   powsybl::iidm::Bus& b2 = vl1.getBusBreakerView().newBus().setId("BUS2").add();
@@ -54,11 +50,8 @@ TEST(DataInterfaceTest, testSwitchInterface_1) {
   swAdder.setBus2("BUS2");
 
   powsybl::iidm::Switch& aSwitch = swAdder.add();
-  ASSERT_EQ(aSwitch.getId(), "Sw");
-
   SwitchInterfaceIIDM sw(aSwitch);
   ASSERT_EQ(sw.getID(), "Sw");
-  ASSERT_EQ(SwitchInterfaceIIDM::VAR_STATE, 0);
   ASSERT_FALSE(sw.isOpen());
 
   const boost::shared_ptr<BusInterface> x_b1(new BusInterfaceIIDM(b1));
@@ -77,48 +70,6 @@ TEST(DataInterfaceTest, testSwitchInterface_1) {
 
   ASSERT_EQ(sw.getComponentVarIndex("state"), 0);
   ASSERT_EQ(sw.getComponentVarIndex("others"), -1);
-
-  sw.importStaticParameters();
-  sw.exportStateVariablesUnitComponent();
-
-}  // TEST(DataInterfaceTest, testSwitchInterface_1)
-
-TEST(DataInterfaceTest, testSwitchInterface_2) {
-  Network network("test", "test");
-
-  Substation& s = network.newSubstation()
-                       .setId("S")
-                       .add();
-
-  VoltageLevel& vl1 = s.newVoltageLevel()
-                       .setId("VL1")
-                       .setNominalVoltage(400.)
-                       .setTopologyKind(TopologyKind::NODE_BREAKER)
-                       .setNominalVoltage(225.0)
-                       .setLowVoltageLimit(0.0)
-                       .setHighVoltageLimit(250.0)
-                       .add();
-
-  auto swAdder1 = vl1.getNodeBreakerView().newSwitch()
-                       .setId("BREAKER4")
-                       .setName("NameOfOneSwitch")
-                       .setNode1(0)
-                       .setNode2(1)
-                       .setKind(powsybl::iidm::SwitchKind::BREAKER);
-
-  powsybl::iidm::Switch& aSwitch = swAdder1.add();
-  ASSERT_EQ(aSwitch.getId(), "BREAKER4");
-
-  auto swAdder2 = vl1.getNodeBreakerView().newSwitch()
-                       .setId("DISCONNECTOR7")
-                       .setNode1(6)
-                       .setNode2(7)
-                       .setKind(powsybl::iidm::SwitchKind::DISCONNECTOR);
-  swAdder2.add();
-
-  const VoltageLevel& cVl = vl1;
-  ASSERT_EQ(2UL, cVl.getSwitchCount());
-
-}  // TEST(DataInterfaceTest, testSwitchInterface_2)
+}  // TEST(DataInterfaceTest, Switch)
 
 }  // namespace DYN

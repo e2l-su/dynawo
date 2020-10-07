@@ -20,15 +20,12 @@
 #ifndef MODELER_DATAINTERFACE_POWSYBLIIDM_DYNSWITCHINTERFACEIIDM_H_
 #define MODELER_DATAINTERFACE_POWSYBLIIDM_DYNSWITCHINTERFACEIIDM_H_
 
+#include <powsybl/iidm/Switch.hpp>
+
 #include <boost/shared_ptr.hpp>
 #include "DYNSwitchInterface.h"
 
-namespace powsybl::iidm {
-class Switch;
-}
-
 namespace DYN {
-class Switch;
 
 class SwitchInterfaceIIDM : public SwitchInterface {
  public:
@@ -108,7 +105,7 @@ class SwitchInterfaceIIDM : public SwitchInterface {
   powsybl::iidm::Switch& switchIIDM_;              ///< reference to the iidm switch instance
   boost::shared_ptr<BusInterface> busInterface1_;  ///< busInterface of the bus where the side 1 of the switch is connected
   boost::shared_ptr<BusInterface> busInterface2_;  ///< busInterface of the bus where the side 2 of the switch is connected
-};                                                 ///< class for switch model interface
+};                                                 ///< class switch interface so Dynawo may use powsybl::iidm::Switch
 }  // namespace DYN
 
 #endif  // MODELER_DATAINTERFACE_POWSYBLIIDM_DYNSWITCHINTERFACEIIDM_H_

@@ -19,13 +19,10 @@
  */
 #include <powsybl/iidm/Switch.hpp>
 
-#include "DYNBusInterface.h"
 #include "DYNModelConstants.h"
-#include "DYNStateVariable.h"
 #include "DYNSwitchInterfaceIIDM.h"
 
 using boost::shared_ptr;
-using std::string;
 
 namespace DYN {
 
@@ -36,7 +33,6 @@ SwitchInterfaceIIDM::SwitchInterfaceIIDM(powsybl::iidm::Switch& sw) : switchIIDM
   setType(ComponentInterface::SWITCH);
   stateVariables_.resize(1);
   stateVariables_[VAR_STATE] = StateVariable("state", StateVariable::INT);
-  stateVariables_[VAR_STATE].setValue(OPEN);
 }
 
 bool
@@ -44,7 +40,7 @@ SwitchInterfaceIIDM::isOpen() const {
   return switchIIDM_.isOpen();
 }
 
-string
+std::string
 SwitchInterfaceIIDM::getID() const {
   return switchIIDM_.getId();
 }
