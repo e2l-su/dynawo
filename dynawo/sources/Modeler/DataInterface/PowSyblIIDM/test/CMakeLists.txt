@@ -12,6 +12,7 @@ set(MODULE_NAME MODELER_DATAINTERFACEIIDM_unittest)
 
 set(MODULE_SOURCES
   TestBusInterface.cpp
+  TestLineInterface.cpp
   TestSwitchInterface.cpp
 )
 

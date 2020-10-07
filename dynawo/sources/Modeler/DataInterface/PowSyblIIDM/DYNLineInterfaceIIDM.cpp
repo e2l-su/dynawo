@@ -30,8 +30,6 @@
 #include "DYNTrace.h"
 
 using boost::shared_ptr;
-using std::string;
-using std::vector;
 
 namespace DYN {
 
@@ -85,7 +83,7 @@ LineInterfaceIIDM::getVNom1() const {
   if (lineIIDM_.getTerminal1().isConnected()) {
     return lineIIDM_.getTerminal1().getVoltageLevel().getNominalVoltage();
   }
-  return 0;
+  return 0.0;
 }
 
 double
@@ -93,7 +91,7 @@ LineInterfaceIIDM::getVNom2() const {
   if (lineIIDM_.getTerminal2().isConnected()) {
     return lineIIDM_.getTerminal2().getVoltageLevel().getNominalVoltage();
   }
-  return 0;
+  return 0.0;
 }
 
 double
@@ -132,7 +130,7 @@ LineInterfaceIIDM::getG2() const {
 
 double
 LineInterfaceIIDM::getP1() {
-  double P = 0;
+  double P = 0.0;
   if (getInitialConnected1()) {
     if (std::isnan(lineIIDM_.getTerminal1().getP())) {
       Trace::warn("DATAINTERFACE") << DYNLog(VariableNotSet, "line", lineIIDM_.getId(), "P1") << Trace::endline;
@@ -145,7 +143,7 @@ LineInterfaceIIDM::getP1() {
 
 double
 LineInterfaceIIDM::getQ1() {
-  double Q = 0;
+  double Q = 0.0;
   if (getInitialConnected1()) {
     if (std::isnan(lineIIDM_.getTerminal1().getQ())) {
       Trace::warn("DATAINTERFACE") << DYNLog(VariableNotSet, "line", lineIIDM_.getId(), "Q1") << Trace::endline;
@@ -158,7 +156,7 @@ LineInterfaceIIDM::getQ1() {
 
 double
 LineInterfaceIIDM::getP2() {
-  double P = 0;
+  double P = 0.0;
   if (getInitialConnected2()) {
     if (std::isnan(lineIIDM_.getTerminal2().getP())) {
       Trace::warn("DATAINTERFACE") << DYNLog(VariableNotSet, "line", lineIIDM_.getId(), "P2") << Trace::endline;
@@ -171,7 +169,7 @@ LineInterfaceIIDM::getP2() {
 
 double
 LineInterfaceIIDM::getQ2() {
-  double Q = 0;
+  double Q = 0.0;
   if (getInitialConnected2()) {
     if (std::isnan(lineIIDM_.getTerminal2().getQ())) {
       Trace::warn("DATAINTERFACE") << DYNLog(VariableNotSet, "line", lineIIDM_.getId(), "Q2") << Trace::endline;
@@ -198,7 +196,7 @@ LineInterfaceIIDM::getInitialConnected2() {
   return initialConnected2_.value();
 }
 
-string
+std::string
 LineInterfaceIIDM::getID() const {
   return lineIIDM_.getId();
 }
@@ -213,12 +211,12 @@ LineInterfaceIIDM::addCurrentLimitInterface2(const shared_ptr<CurrentLimitInterf
   currentLimitInterfaces2_.push_back(currentLimitInterface);
 }
 
-vector<shared_ptr<CurrentLimitInterface> >
+std::vector<shared_ptr<CurrentLimitInterface> >
 LineInterfaceIIDM::getCurrentLimitInterfaces1() const {
   return currentLimitInterfaces1_;
 }
 
-vector<shared_ptr<CurrentLimitInterface> >
+std::vector<shared_ptr<CurrentLimitInterface> >
 LineInterfaceIIDM::getCurrentLimitInterfaces2() const {
   return currentLimitInterfaces2_;
 }
