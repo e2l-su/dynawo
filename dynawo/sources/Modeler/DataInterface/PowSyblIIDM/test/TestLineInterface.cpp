@@ -11,8 +11,8 @@
 // simulation tool for power systems.
 //
 
-#include "DYNBusInterfaceIIDM.h"
 #include "DYNLineInterfaceIIDM.h"
+#include "DYNBusInterfaceIIDM.h"
 
 #include "gtest_dynawo.h"
 
@@ -120,27 +120,48 @@ TEST(DataInterfaceTest, Line) {
   ASSERT_EQ(li.getBusInterface1().get()->getID(), "VL1_BUS1");
   ASSERT_EQ(li.getBusInterface2().get()->getID(), "VL3_BUS1");
 
-  MyLine.getTerminal1().disconnect();
-  ASSERT_EQ(li.getVNom1(), 0.0);
-  MyLine.getTerminal2().disconnect();
-  ASSERT_EQ(li.getVNom2(), 0.0);
-  MyLine.getTerminal1().connect();
-  ASSERT_EQ(li.getVNom1(), 380.0);
-  MyLine.getTerminal2().connect();
-  ASSERT_EQ(li.getVNom2(), 360.0);
-
   ASSERT_TRUE(li.getInitialConnected1());
   ASSERT_TRUE(li.getInitialConnected2());
 
-  // FAIRE: ici manquent qqs VoltageLevelInterface
-  // FAIRE: ici manquent qqs CurrentLimitInterface
+  MyLine.getTerminal1().disconnect();
+  MyLine.getTerminal2().disconnect();
+  ASSERT_EQ(li.getVNom1(), 0.0);
+  ASSERT_EQ(li.getVNom2(), 0.0);
+  ASSERT_TRUE(li.getInitialConnected1());
+  ASSERT_TRUE(li.getInitialConnected2());
 
-  ASSERT_EQ(li.getP1(), 0.0);
-  ASSERT_EQ(li.getQ1(), 0.0);
-  ASSERT_EQ(li.getP2(), 0.0);
-  ASSERT_EQ(li.getQ2(), 0.0);
+  MyLine.getTerminal1().connect();
+  MyLine.getTerminal2().connect();
+  ASSERT_EQ(li.getVNom1(), 380.0);
+  ASSERT_EQ(li.getVNom2(), 360.0);
 
-  // FAIRE manquent les tests quand les var (p1, p2, q1, q2) sont renseignées
+  // DG FAIRE: ici manquent qqs VoltageLevelInterface
+  // DG FAIRE: ici manquent qqs CurrentLimitInterface
+
+  ASSERT_EQ(li.getComponentVarIndex(std::string("p1")), LineInterfaceIIDM::VAR_P1);
+  ASSERT_EQ(li.getComponentVarIndex(std::string("p11")), -1);
+  ASSERT_EQ(li.getComponentVarIndex(std::string("P1")), -1);
+  ASSERT_EQ(li.getComponentVarIndex("P1"), -1);
+  ASSERT_EQ(li.getComponentVarIndex("1"), -1);
+  ASSERT_EQ(li.getComponentVarIndex(std::string("p2")), LineInterfaceIIDM::VAR_P2);
+  ASSERT_EQ(li.getComponentVarIndex(std::string("q1")), LineInterfaceIIDM::VAR_Q1);
+  ASSERT_EQ(li.getComponentVarIndex(std::string("q2")), LineInterfaceIIDM::VAR_Q2);
+  ASSERT_EQ(li.getComponentVarIndex(std::string("state")), LineInterfaceIIDM::VAR_STATE);
+  ASSERT_THROW(li.getComponentVarIndex(nullptr), std::logic_error);
+
+  ASSERT_DOUBLE_EQ(li.getP1(), 0.0);
+  ASSERT_DOUBLE_EQ(li.getQ1(), 0.0);
+  ASSERT_DOUBLE_EQ(li.getP2(), 0.0);
+  ASSERT_DOUBLE_EQ(li.getQ2(), 0.0);
+
+  MyLine.getTerminal1().setP(999.999L);
+  MyLine.getTerminal1().setQ(666);
+  MyLine.getTerminal2().setP(999.999999999999999/2);
+  MyLine.getTerminal2().setQ(666.0/3.0);
+  ASSERT_DOUBLE_EQ(li.getP1(), 999.999);
+  ASSERT_DOUBLE_EQ(li.getQ1(), 666.0);
+  ASSERT_DOUBLE_EQ(li.getP2(), 500.0);
+  ASSERT_DOUBLE_EQ(li.getQ2(), 222.0);
 
   powsybl::iidm::Line& MyBadLine = network.newLine()
                                        .setId("VL1_VL3_Bad")
@@ -162,5 +183,4 @@ TEST(DataInterfaceTest, Line) {
   ASSERT_EQ(li2.getR(), 0.0);
   ASSERT_EQ(li2.getX(), 0.01);
 }  // TEST(DataInterfaceTest, Line)
-
 }  // namespace DYN

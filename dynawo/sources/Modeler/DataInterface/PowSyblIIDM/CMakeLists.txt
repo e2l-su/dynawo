@@ -17,8 +17,9 @@ set(DATA_INTERFACE_IIDM_VERSION_MAJOR ${DYNAWO_VERSION_MAJOR})
 set(DATA_INTERFACE_IIDM_SOURCES
    DYNBusInterfaceIIDM.cpp
 #   DYNCalculatedBusInterfaceIIDM.cpp
-   DYNSwitchInterfaceIIDM.cpp
+   DYNCurrentLimitInterfaceIIDM.cpp
    DYNLineInterfaceIIDM.cpp
+   DYNSwitchInterfaceIIDM.cpp
 #   DYNTwoWTransformerInterfaceIIDM.cpp
 #   DYNThreeWTransformerInterfaceIIDM.cpp
 #-   DYNLoadInterfaceIIDM.cpp
@@ -30,20 +31,17 @@ set(DATA_INTERFACE_IIDM_SOURCES
 #   DYNPhaseTapChangerInterfaceIIDM.cpp
 #   DYNRatioTapChangerInterfaceIIDM.cpp
 #   DYNStepInterfaceIIDM.cpp
-#   DYNCurrentLimitInterfaceIIDM.cpp
-#   DYNDataInterfaceIIDM.cpp
+#   DYNDataInterfaceIIDM.cpp                   # DG: and .h in next var
 #   DYNVoltageLevelInterfaceIIDM.cpp
 #   DYNVscConverterInterfaceIIDM.cpp
 #   DYNLccConverterInterfaceIIDM.cpp
 #   DYNHvdcLineInterfaceIIDM.cpp
 )
 
-
 set(DATA_INTERFACE_IIDM_INCLUDE_HEADERS
-   DYNBusInterfaceIIDM.h
-   DYNLineInterfaceIIDM.h
-   DYNSwitchInterfaceIIDM.h
+#   DYNDataInterfaceIIDM.h
     )
+
 
 add_library(dynawo_DataInterfaceIIDM ${LIBRARY_TYPE} ${DATA_INTERFACE_IIDM_SOURCES})
 
