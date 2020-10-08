@@ -136,18 +136,13 @@ TEST(DataInterfaceTest, Line) {
   ASSERT_EQ(li.getVNom2(), 360.0);
 
   // DG FAIRE: ici manquent qqs VoltageLevelInterface
-  // DG FAIRE: ici manquent qqs CurrentLimitInterface
 
   ASSERT_EQ(li.getComponentVarIndex(std::string("p1")), LineInterfaceIIDM::VAR_P1);
-  ASSERT_EQ(li.getComponentVarIndex(std::string("p11")), -1);
   ASSERT_EQ(li.getComponentVarIndex(std::string("P1")), -1);
-  ASSERT_EQ(li.getComponentVarIndex("P1"), -1);
-  ASSERT_EQ(li.getComponentVarIndex("1"), -1);
   ASSERT_EQ(li.getComponentVarIndex(std::string("p2")), LineInterfaceIIDM::VAR_P2);
   ASSERT_EQ(li.getComponentVarIndex(std::string("q1")), LineInterfaceIIDM::VAR_Q1);
   ASSERT_EQ(li.getComponentVarIndex(std::string("q2")), LineInterfaceIIDM::VAR_Q2);
   ASSERT_EQ(li.getComponentVarIndex(std::string("state")), LineInterfaceIIDM::VAR_STATE);
-  ASSERT_THROW(li.getComponentVarIndex(nullptr), std::logic_error);
 
   ASSERT_DOUBLE_EQ(li.getP1(), 0.0);
   ASSERT_DOUBLE_EQ(li.getQ1(), 0.0);
@@ -163,7 +158,7 @@ TEST(DataInterfaceTest, Line) {
   ASSERT_DOUBLE_EQ(li.getP2(), 500.0);
   ASSERT_DOUBLE_EQ(li.getQ2(), 222.0);
 
-  powsybl::iidm::Line& MyBadLine = network.newLine()
+  powsybl::iidm::Line& MySecondLine = network.newLine()
                                        .setId("VL1_VL3_Bad")
                                        .setVoltageLevel1(vl1.getId())
                                        .setBus1(vl1Bus1.getId())
@@ -178,9 +173,17 @@ TEST(DataInterfaceTest, Line) {
                                        .setG2(2.0)
                                        .setB2(0.4)
                                        .add();
-  LineInterfaceIIDM li2(MyBadLine);
+  MySecondLine.getTerminal1().disconnect();
+  MySecondLine.getTerminal2().disconnect();
 
+  LineInterfaceIIDM li2(MySecondLine);
+  ASSERT_FALSE(li2.getInitialConnected1());
+  ASSERT_FALSE(li2.getInitialConnected2());
   ASSERT_EQ(li2.getR(), 0.0);
   ASSERT_EQ(li2.getX(), 0.01);
+  ASSERT_DOUBLE_EQ(li2.getP1(), 0.0);
+  ASSERT_DOUBLE_EQ(li2.getQ1(), 0.0);
+  ASSERT_DOUBLE_EQ(li2.getP2(), 0.0);
+  ASSERT_DOUBLE_EQ(li2.getQ2(), 0.0);
 }  // TEST(DataInterfaceTest, Line)
 }  // namespace DYN
