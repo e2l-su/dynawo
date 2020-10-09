@@ -15,14 +15,14 @@ set(DATA_INTERFACE_IIDM_VERSION_STRING ${DYNAWO_VERSION_STRING})
 set(DATA_INTERFACE_IIDM_VERSION_MAJOR ${DYNAWO_VERSION_MAJOR})
 
 set(DATA_INTERFACE_IIDM_SOURCES
-   DYNBusInterfaceIIDM.cpp
+    DYNBusInterfaceIIDM.cpp
 #   DYNCalculatedBusInterfaceIIDM.cpp
-   DYNCurrentLimitInterfaceIIDM.cpp
-   DYNLineInterfaceIIDM.cpp
-   DYNSwitchInterfaceIIDM.cpp
+    DYNCurrentLimitInterfaceIIDM.cpp
+    DYNLineInterfaceIIDM.cpp
+#    DYNLoadInterfaceIIDM.cpp
+    DYNSwitchInterfaceIIDM.cpp
 #   DYNTwoWTransformerInterfaceIIDM.cpp
 #   DYNThreeWTransformerInterfaceIIDM.cpp
-#-   DYNLoadInterfaceIIDM.cpp
 #   DYNShuntCompensatorInterfaceIIDM.cpp
 #   DYNStaticVarCompensatorInterfaceIIDM.cpp
 #   DYNGeneratorInterfaceIIDM.cpp
@@ -31,17 +31,16 @@ set(DATA_INTERFACE_IIDM_SOURCES
 #   DYNPhaseTapChangerInterfaceIIDM.cpp
 #   DYNRatioTapChangerInterfaceIIDM.cpp
 #   DYNStepInterfaceIIDM.cpp
-#   DYNDataInterfaceIIDM.cpp                   # DG: and .h in next var
+#   DYNDataInterfaceIIDM.cpp
 #   DYNVoltageLevelInterfaceIIDM.cpp
 #   DYNVscConverterInterfaceIIDM.cpp
 #   DYNLccConverterInterfaceIIDM.cpp
 #   DYNHvdcLineInterfaceIIDM.cpp
-)
-
-set(DATA_INTERFACE_IIDM_INCLUDE_HEADERS
-#   DYNDataInterfaceIIDM.h
     )
 
+set(DATA_INTERFACE_IIDM_INCLUDE_HEADERS
+#    DYNDataInterfaceIIDM.h
+    )
 
 add_library(dynawo_DataInterfaceIIDM ${LIBRARY_TYPE} ${DATA_INTERFACE_IIDM_SOURCES})
 
