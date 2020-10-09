@@ -183,10 +183,15 @@ TEST(DataInterfaceTest, Line) {
   ASSERT_FALSE(li2.getInitialConnected2());
   ASSERT_EQ(li2.getR(), 0.0);
   ASSERT_EQ(li2.getX(), 0.01);
+  ASSERT_DOUBLE_EQ(li2.getP1(), 0.0);
+  ASSERT_DOUBLE_EQ(li2.getP2(), 0.0);
+  ASSERT_DOUBLE_EQ(li2.getQ1(), 0.0);
+  ASSERT_DOUBLE_EQ(li2.getQ2(), 0.0);
 
   MySecondLine.getTerminal1().setP(std::numeric_limits<double>::infinity());
-  MySecondLine.getTerminal2().setP(-4444) ;
+  MySecondLine.getTerminal2().setP(-4444);
   MySecondLine.getTerminal1().setQ(444.4);
+  MySecondLine.getTerminal2().setQ(std::nan("not  a number"));
   ASSERT_DOUBLE_EQ(li2.getP1(), 0.0);
   ASSERT_DOUBLE_EQ(li2.getP2(), 0.0);
   ASSERT_DOUBLE_EQ(li2.getQ1(), 0.0);
