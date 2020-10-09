@@ -191,7 +191,7 @@ TEST(DataInterfaceTest, Line) {
   MySecondLine.getTerminal1().setP(std::numeric_limits<double>::infinity());
   MySecondLine.getTerminal2().setP(-4444);
   MySecondLine.getTerminal1().setQ(444.4);
-  MySecondLine.getTerminal2().setQ(std::nan("not  a number"));
+  MySecondLine.getTerminal2().setQ(0);
   ASSERT_DOUBLE_EQ(li2.getP1(), 0.0);
   ASSERT_DOUBLE_EQ(li2.getP2(), 0.0);
   ASSERT_DOUBLE_EQ(li2.getQ1(), 0.0);
