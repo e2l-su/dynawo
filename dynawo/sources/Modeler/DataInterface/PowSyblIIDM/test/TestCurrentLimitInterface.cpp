@@ -16,7 +16,7 @@
 #include "gtest_dynawo.h"
 
 
-// DG- namespace DYN {
+namespace DYN {
 
 TEST(DataInterfaceTest, CurrentLimit) {
   DYN::CurrentLimitInterfaceIIDM C(1.0, 99);
@@ -32,5 +32,4 @@ TEST(DataInterfaceTest, CurrentLimit) {
   ASSERT_DOUBLE_EQ(E.getLimit(), -1000);
   ASSERT_EQ(E.getAcceptableDuration(), std::numeric_limits<int>::max());
 }  // TEST(DataInterfaceTest, CurrentLimit)
-
-// DG- }  // namespace DYN
+}  // namespace DYN

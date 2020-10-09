@@ -185,5 +185,17 @@ TEST(DataInterfaceTest, Line) {
   ASSERT_DOUBLE_EQ(li2.getQ1(), 0.0);
   ASSERT_DOUBLE_EQ(li2.getP2(), 0.0);
   ASSERT_DOUBLE_EQ(li2.getQ2(), 0.0);
+
+  MySecondLine.getTerminal1().setP(std::nan("not a number"));
+  ASSERT_DOUBLE_EQ(li2.getP1(), 0.0);
+
+  int i=2; int j=4*i; j+=2;
+  ASSERT_FALSE(std::isfinite(1.0/static_cast<double>(10-j)));
+  MySecondLine.getTerminal2().setP(1.0/static_cast<double>(10-j));
+  MySecondLine.getTerminal1().setQ(1.0/static_cast<double>(10-j));
+  MySecondLine.getTerminal2().setQ(1.0/static_cast<double>(10-j));
+  ASSERT_DOUBLE_EQ(li2.getP2(), 0.0);
+  ASSERT_DOUBLE_EQ(li2.getQ1(), 0.0);
+  ASSERT_DOUBLE_EQ(li2.getQ2(), 0.0);
 }  // TEST(DataInterfaceTest, Line)
 }  // namespace DYN
