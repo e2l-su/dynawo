@@ -22,6 +22,8 @@
 #include <powsybl/iidm/Network.hpp>
 #include <powsybl/iidm/Substation.hpp>
 
+#include <limits.h>
+
 namespace DYN {
 
 TEST(DataInterfaceTest, Line) {
@@ -181,16 +183,10 @@ TEST(DataInterfaceTest, Line) {
   ASSERT_FALSE(li2.getInitialConnected2());
   ASSERT_EQ(li2.getR(), 0.0);
   ASSERT_EQ(li2.getX(), 0.01);
-  ASSERT_DOUBLE_EQ(li2.getP1(), 0.0);
-  ASSERT_DOUBLE_EQ(li2.getQ1(), 0.0);
-  ASSERT_DOUBLE_EQ(li2.getP2(), 0.0);
-  ASSERT_DOUBLE_EQ(li2.getQ2(), 0.0);
 
-  int i=2; int j=4*i; j+=2;
-  MySecondLine.getTerminal1().setP(1.0/static_cast<double>(10-j));
-  MySecondLine.getTerminal2().setP(1.0/static_cast<double>(10-j));
-  MySecondLine.getTerminal1().setQ(1.0/static_cast<double>(10-j));
-  MySecondLine.getTerminal2().setQ(1.0/static_cast<double>(10-j));
+  MySecondLine.getTerminal1().setP(std::numeric_limits<double>::infinity());
+  MySecondLine.getTerminal2().setP(-4444) ;
+  MySecondLine.getTerminal1().setQ(444.4);
   ASSERT_DOUBLE_EQ(li2.getP1(), 0.0);
   ASSERT_DOUBLE_EQ(li2.getP2(), 0.0);
   ASSERT_DOUBLE_EQ(li2.getQ1(), 0.0);
