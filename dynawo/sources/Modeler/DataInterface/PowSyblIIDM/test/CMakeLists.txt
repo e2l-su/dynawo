@@ -13,7 +13,9 @@ set(MODULE_NAME MODELER_DATAINTERFACEIIDM_unittest)
 set(MODULE_SOURCES
   TestBusInterface.cpp
   TestCurrentLimitInterface.cpp
+  TestInjectorInterface.cpp
   TestLineInterface.cpp
+#  TestLoadInterface.cpp
   TestSwitchInterface.cpp
 )
 
