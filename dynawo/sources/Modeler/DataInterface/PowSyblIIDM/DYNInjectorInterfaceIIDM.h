@@ -20,11 +20,11 @@
  */
 //======================================================================
 
-#include "DYNBusInterface.h"
-#include "DYNVoltageLevelInterface.h"
-
 #ifndef MODELER_DATAINTERFACE_POWSYBLIIDM_DYNINJECTORINTERFACEIIDM_H_
 #define MODELER_DATAINTERFACE_POWSYBLIIDM_DYNINJECTORINTERFACEIIDM_H_
+
+#include "DYNBusInterface.h"
+#include "DYNVoltageLevelInterface.h"
 
 #include <powsybl/iidm/Injection.hpp>
 
@@ -120,9 +120,12 @@ class InjectorInterfaceIIDM {
  protected:
   powsybl::iidm::Injection& injectorIIDM_;                        ///< reference to the iidm injector instance
   std::string injectorId_;                                        ///< injector's id
-  boost::shared_ptr<BusInterface> busInterface_;                  ///< busInterface of the bus where the injector is connected
+//  boost::shared_ptr<BusInterface> busInterface_;                  ///< busInterface of the bus where the injector is connected
   boost::weak_ptr<VoltageLevelInterface> voltageLevelInterface_;  ///< voltageLevel interface where the injector is connected
   boost::optional<bool> initialConnected_;                        ///< whether the injector is initially connected or not
+
+ private:
+  boost::shared_ptr<BusInterface> busInterface_;                  ///< busInterface of the bus where the injector is connected
 };
 
 }  // namespace DYN

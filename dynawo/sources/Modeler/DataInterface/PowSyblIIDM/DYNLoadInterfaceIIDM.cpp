@@ -59,26 +59,17 @@ LoadInterfaceIIDM::getComponentVarIndex(const string& varName) const {
 
 void
 LoadInterfaceIIDM::exportStateVariablesUnitComponent() {
-  //  bool connected = (getValue<int>(VAR_STATE) == CLOSED);
-  /* FAIRE-DG  loadIIDM_.p(getValue<double>(VAR_P) * SNREF);
-  loadIIDM_.q(getValue<double>(VAR_Q) * SNREF);
+  bool connected = (getValue<int>(VAR_STATE) == CLOSED);
 
-  if (loadIIDM_.has_connection()) {
-    if (loadIIDM_.connectionPoint()->is_bus()) {
-      if (connected)
-        loadIIDM_.connect();
-      else
-        loadIIDM_.disconnect();
-    } else {  // is node()
-      // should be removed once a solution has been found to propagate switches (de)connection
-      // following component (de)connection (only Modelica models)
-      if (connected && !getInitialConnected())
-        getVoltageLevelInterface()->connectNode(loadIIDM_.node());
-      else if (!connected && getInitialConnected())
-        getVoltageLevelInterface()->disconnectNode(loadIIDM_.node());
-    }
+  loadIIDM_.getTerminal().setP(getValue<double>(VAR_P) * SNREF);
+  loadIIDM_.getTerminal().setQ(getValue<double>(VAR_Q) * SNREF);
+
+  if (loadIIDM_.getTerminal().isConnected()) {
+    if (connected)
+      loadIIDM_.getTerminal().connect();
+    else
+      loadIIDM_.getTerminal().disconnect();
   }
-*/
 }
 
 void
@@ -103,16 +94,10 @@ LoadInterfaceIIDM::importStaticParameters() {
   staticParameters_.insert(std::make_pair("q0", StaticParameter("q0", StaticParameter::DOUBLE).setValue(Q0)));
   staticParameters_.insert(std::make_pair("sn", StaticParameter("sn", StaticParameter::DOUBLE).setValue(SN)));
 
-  //DG-  if (busInterface_ && loadIIDM_.has_voltageLevel()) {
-  if (busInterface_) {
-    v0_ = busInterface_->getV0();
-    //-DG    if (loadIIDM_.voltageLevel().nominalV() > 0)
-    //-DG      vNom_ = loadIIDM_.voltageLevel().nominalV();
-    //-DG    else
-    //-DG      throw DYNError(Error::MODELER, UndefinedNominalV, loadIIDM_.voltageLevel().getId());
-    //DG+    return loadIIDM_.getVoltageLevel().getNominalVoltage();  //+DG
+  if (getBusInterface()) {
+    v0_ = getBusInterface()->getV0();
 
-    double teta = busInterface_->getAngle0();
+    double teta = getBusInterface()->getAngle0();
     staticParameters_.insert(std::make_pair("v_pu", StaticParameter("v_pu", StaticParameter::DOUBLE).setValue(v0_ / vNom_)));
     staticParameters_.insert(std::make_pair("angle_pu", StaticParameter("angle_pu", StaticParameter::DOUBLE).setValue(teta * M_PI / 180)));
     staticParameters_.insert(std::make_pair("v", StaticParameter("v", StaticParameter::DOUBLE).setValue(v0_)));

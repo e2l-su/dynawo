@@ -17,16 +17,17 @@
  * @brief Line data interface : implementation file for IIDM interface
  *
  */
+
+#include "DYNLineInterfaceIIDM.h"
+
 #include <powsybl/iidm/Bus.hpp>
 #include <powsybl/iidm/Line.hpp>
 #include <powsybl/iidm/VoltageLevel.hpp>
 
 #include "DYNCommon.h"
-#include "DYNLineInterfaceIIDM.h"
 #include "DYNModelConstants.h"
 #include "DYNStateVariable.h"
 #include "DYNVoltageLevelInterface.h"
-
 #include "DYNTrace.h"
 
 using boost::shared_ptr;

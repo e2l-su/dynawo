@@ -11,10 +11,10 @@
 // simulation tool for power systems.
 //
 
-#include "DYNInjectorInterfaceIIDM.h"
+#include "DYNLoadInterfaceIIDM.h"
 
 #include "DYNBusInterfaceIIDM.h"
-#include "DYNLoadInterfaceIIDM.h"
+#include "DYNInjectorInterfaceIIDM.h"
 #include "DYNVoltageLevelInterfaceIIDM.h"
 
 #include <powsybl/iidm/Bus.hpp>
@@ -27,7 +27,7 @@
 
 namespace DYN {
 
-TEST(DataInterfaceTest, Injector) {
+TEST(DataInterfaceTest, Load) {
   using powsybl::iidm::Bus;
   using powsybl::iidm::Load;
   using powsybl::iidm::LoadType;
@@ -93,32 +93,63 @@ TEST(DataInterfaceTest, Injector) {
   ASSERT_TRUE(loadIfce.getInitialConnected());
   load.getTerminal().disconnect();
   ASSERT_TRUE(loadIfce.getInitialConnected());
-  {
-    LoadInterfaceIIDM connectedLoadIfce(load);
-    ASSERT_FALSE(connectedLoadIfce.getInitialConnected());
-    load.getTerminal().connect();
-    ASSERT_FALSE(connectedLoadIfce.getInitialConnected());
-    ASSERT_DOUBLE_EQ(connectedLoadIfce.getP(), 0.0);
-    ASSERT_DOUBLE_EQ(connectedLoadIfce.getQ(), 0.0);
-  }
 
   ASSERT_EQ(loadIfce.getBusInterface().get(), nullptr);
   const boost::shared_ptr<BusInterface> busIfce(new BusInterfaceIIDM(bus1));
   loadIfce.setBusInterface(busIfce);
   ASSERT_EQ(loadIfce.getBusInterface().get()->getID(), "VL1_BUS1");
 
+  ASSERT_FALSE(loadIfce.hasP());  // GGGF --> normal
+  ASSERT_FALSE(loadIfce.hasQ());  // GGGF
+
+  {  // tests assuming getInitialConnected == false
+    LoadInterfaceIIDM connectedLoadIfce(load);
+    ASSERT_FALSE(connectedLoadIfce.getInitialConnected());
+    load.getTerminal().connect();
+    ASSERT_FALSE(connectedLoadIfce.getInitialConnected());
+
+    ASSERT_FALSE(connectedLoadIfce.hasP());
+    ASSERT_FALSE(connectedLoadIfce.hasQ());
+    ASSERT_DOUBLE_EQ(connectedLoadIfce.getP(), 0.0);
+    ASSERT_DOUBLE_EQ(connectedLoadIfce.getQ(), 0.0);
+
+    load.getTerminal().setP(100000.0);
+    ASSERT_TRUE(connectedLoadIfce.hasP());
+    ASSERT_DOUBLE_EQ(connectedLoadIfce.getP(), 0.0);
+
+    load.getTerminal().setQ(1000000000.0);
+    ASSERT_TRUE(connectedLoadIfce.hasQ());
+    ASSERT_DOUBLE_EQ(connectedLoadIfce.getQ(), 0.0);
+
+    load.getTerminal().disconnect();
+    ASSERT_TRUE(connectedLoadIfce.hasP());  // GGGF --> weird since disconnected
+    ASSERT_TRUE(connectedLoadIfce.hasQ());
+  }
+
+  ASSERT_TRUE(loadIfce.hasP());  // It was 'false' before connect/disconnect operations! // GGGF
+  ASSERT_TRUE(loadIfce.hasQ());  //     "                 "
+
+  ASSERT_FALSE(load.getTerminal().isConnected());
+
   ASSERT_DOUBLE_EQ(loadIfce.getP0(), 50.0);
   ASSERT_DOUBLE_EQ(loadIfce.getP(), 0.0);
   load.getTerminal().setP(1000.0);
+  ASSERT_TRUE(loadIfce.hasP());
   ASSERT_DOUBLE_EQ(loadIfce.getP(), 1000.0);
 
   ASSERT_DOUBLE_EQ(loadIfce.getQ0(), 40.0);
   ASSERT_DOUBLE_EQ(loadIfce.getQ(), 0.0);
   load.getTerminal().setQ(499.0);
+  ASSERT_TRUE(loadIfce.hasQ());
   ASSERT_DOUBLE_EQ(loadIfce.getQ(), 499.0);
+
+  // Ci dessous, DG FAIRE
+  loadIfce.importStaticParameters();
+  loadIfce.setBusInterface(nullptr);
+  loadIfce.importStaticParameters();
+  //  loadIfce.exportStateVariablesUnitComponent();
 
   // Manque le test de setVoltageLevelInterface DG - FAIRE
   // loadIfce.getVoltageLevelInterface() ;
-
-}  // TEST(DataInterfaceTest, Injector)
+}  // TEST(DataInterfaceTest, Load)
 }  // namespace DYN
