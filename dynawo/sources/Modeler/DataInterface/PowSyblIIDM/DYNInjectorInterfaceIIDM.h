@@ -115,19 +115,15 @@ class InjectorInterfaceIIDM {
    * @brief Getter for the injector's id
    * @return The id of the injector
    */
-  std::string getID() const;
-
- protected:
-  powsybl::iidm::Injection& injectorIIDM_;                        ///< reference to the iidm injector instance
-  std::string injectorId_;                                        ///< injector's id
-//  boost::shared_ptr<BusInterface> busInterface_;                  ///< busInterface of the bus where the injector is connected
-  boost::weak_ptr<VoltageLevelInterface> voltageLevelInterface_;  ///< voltageLevel interface where the injector is connected
-  boost::optional<bool> initialConnected_;                        ///< whether the injector is initially connected or not
+  const std::string& getID() const;
 
  private:
+  powsybl::iidm::Injection& injectorIIDM_;                        ///< reference to the iidm injector instance
   boost::shared_ptr<BusInterface> busInterface_;                  ///< busInterface of the bus where the injector is connected
+  boost::weak_ptr<VoltageLevelInterface> voltageLevelInterface_;  ///< voltageLevel interface where the injector is connected
+  std::string injectorId_;                                        ///< injector's id
+  boost::optional<bool> initialConnected_;                        ///< whether the injector is initially connected or not
 };
-
 }  // namespace DYN
 
 #include "DYNInjectorInterfaceIIDM.hpp"

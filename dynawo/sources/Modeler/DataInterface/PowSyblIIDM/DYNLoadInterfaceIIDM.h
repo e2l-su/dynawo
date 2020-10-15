@@ -22,8 +22,10 @@
 #ifndef MODELER_DATAINTERFACE_POWSYBLIIDM_DYNLOADINTERFACEIIDM_H_
 #define MODELER_DATAINTERFACE_POWSYBLIIDM_DYNLOADINTERFACEIIDM_H_
 
-#include "DYNInjectorInterfaceIIDM.h"
 #include "DYNLoadInterface.h"
+
+#include "DYNInjectorInterfaceIIDM.h"
+// #include "DYNVoltageLevelInterface.h"
 
 #include <powsybl/iidm/Load.hpp>
 

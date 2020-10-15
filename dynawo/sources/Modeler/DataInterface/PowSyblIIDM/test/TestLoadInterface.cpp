@@ -15,7 +15,6 @@
 
 #include "DYNBusInterfaceIIDM.h"
 #include "DYNInjectorInterfaceIIDM.h"
-#include "DYNVoltageLevelInterfaceIIDM.h"
 
 #include <powsybl/iidm/Bus.hpp>
 #include <powsybl/iidm/Load.hpp>
@@ -27,16 +26,17 @@
 
 namespace DYN {
 
-TEST(DataInterfaceTest, Load) {
-  using powsybl::iidm::Bus;
-  using powsybl::iidm::Load;
-  using powsybl::iidm::LoadType;
-  using powsybl::iidm::Network;
-  using powsybl::iidm::Substation;
-  using powsybl::iidm::TopologyKind;
-  using powsybl::iidm::VoltageLevel;
+using powsybl::iidm::Bus;
+using powsybl::iidm::Load;
+using powsybl::iidm::LoadType;
+using powsybl::iidm::Network;
+using powsybl::iidm::Substation;
+using powsybl::iidm::TopologyKind;
+using powsybl::iidm::VoltageLevel;
 
+TEST(DataInterfaceTest, Load_1) {
   Network network("test", "test");
+
   Substation& substation = network.newSubstation()
                                .setId("S1")
                                .setName("S1_NAME")
@@ -65,16 +65,8 @@ TEST(DataInterfaceTest, Load) {
       .setQ0(40.0)
       .add();
 
-  substation.newVoltageLevel()
-      .setId("VL2")
-      .setName("VL2_NAME")
-      .setTopologyKind(TopologyKind::NODE_BREAKER)
-      .setNominalVoltage(225.0)
-      .setLowVoltageLimit(200.0)
-      .setHighVoltageLimit(260.0)
-      .add();
-
   Load& load = network.getLoad("LOAD1");
+
   ASSERT_EQ("LOAD1", load.getId());
   ASSERT_EQ("LOAD1_NAME", load.getOptionalName());
   ASSERT_EQ(powsybl::iidm::ConnectableType::LOAD, load.getType());
@@ -99,37 +91,9 @@ TEST(DataInterfaceTest, Load) {
   loadIfce.setBusInterface(busIfce);
   ASSERT_EQ(loadIfce.getBusInterface().get()->getID(), "VL1_BUS1");
 
-  ASSERT_FALSE(loadIfce.hasP());  // GGGF --> normal
-  ASSERT_FALSE(loadIfce.hasQ());  // GGGF
-
-  {  // tests assuming getInitialConnected == false
-    LoadInterfaceIIDM connectedLoadIfce(load);
-    ASSERT_FALSE(connectedLoadIfce.getInitialConnected());
-    load.getTerminal().connect();
-    ASSERT_FALSE(connectedLoadIfce.getInitialConnected());
-
-    ASSERT_FALSE(connectedLoadIfce.hasP());
-    ASSERT_FALSE(connectedLoadIfce.hasQ());
-    ASSERT_DOUBLE_EQ(connectedLoadIfce.getP(), 0.0);
-    ASSERT_DOUBLE_EQ(connectedLoadIfce.getQ(), 0.0);
-
-    load.getTerminal().setP(100000.0);
-    ASSERT_TRUE(connectedLoadIfce.hasP());
-    ASSERT_DOUBLE_EQ(connectedLoadIfce.getP(), 0.0);
-
-    load.getTerminal().setQ(1000000000.0);
-    ASSERT_TRUE(connectedLoadIfce.hasQ());
-    ASSERT_DOUBLE_EQ(connectedLoadIfce.getQ(), 0.0);
-
-    load.getTerminal().disconnect();
-    ASSERT_TRUE(connectedLoadIfce.hasP());  // GGGF --> weird since disconnected
-    ASSERT_TRUE(connectedLoadIfce.hasQ());
-  }
-
-  ASSERT_TRUE(loadIfce.hasP());  // It was 'false' before connect/disconnect operations! // GGGF
-  ASSERT_TRUE(loadIfce.hasQ());  //     "                 "
-
   ASSERT_FALSE(load.getTerminal().isConnected());
+  ASSERT_FALSE(loadIfce.hasP());
+  ASSERT_FALSE(loadIfce.hasQ());
 
   ASSERT_DOUBLE_EQ(loadIfce.getP0(), 50.0);
   ASSERT_DOUBLE_EQ(loadIfce.getP(), 0.0);
@@ -151,5 +115,63 @@ TEST(DataInterfaceTest, Load) {
 
   // Manque le test de setVoltageLevelInterface DG - FAIRE
   // loadIfce.getVoltageLevelInterface() ;
-}  // TEST(DataInterfaceTest, Load)
+}  // TEST(DataInterfaceTest, Load_1)
+
+TEST(DataInterfaceTest, Load_2) {  // tests assuming getInitialConnected == false
+  Network network("test", "test");
+
+  Substation& substation = network.newSubstation()
+                               .setId("S1")
+                               .setName("S1_NAME")
+                               .setCountry(powsybl::iidm::Country::FR)
+                               .setTso("TSO")
+                               .add();
+
+  VoltageLevel& vl1 = substation.newVoltageLevel()
+                          .setId("VL1")
+                          .setName("VL1_NAME")
+                          .setTopologyKind(TopologyKind::BUS_BREAKER)
+                          .setNominalVoltage(380.0)
+                          .setLowVoltageLimit(340.0)
+                          .setHighVoltageLimit(420.0)
+                          .add();
+
+  vl1.getBusBreakerView().newBus().setId("VL1_BUS1").add();
+
+  vl1.newLoad()
+      .setId("LOAD")
+      .setBus("VL1_BUS1")
+      .setConnectableBus("VL1_BUS1")
+      .setName("LOAD1_NAME")
+      .setLoadType(LoadType::UNDEFINED)
+      .setP0(500.0)
+      .setQ0(400.0)
+      .add();
+
+  Load& load = network.getLoad("LOAD");
+  LoadInterfaceIIDM loadIfce(load);
+  ASSERT_EQ(loadIfce.getID(), "LOAD");
+
+  load.getTerminal().disconnect();
+  ASSERT_FALSE(loadIfce.getInitialConnected());
+
+  load.getTerminal().connect();
+  ASSERT_TRUE(load.getTerminal().isConnected());
+  ASSERT_FALSE(loadIfce.getInitialConnected());
+
+  ASSERT_FALSE(loadIfce.hasP());
+  ASSERT_FALSE(loadIfce.hasQ());
+
+  ASSERT_DOUBLE_EQ(loadIfce.getP0(), 500.0);
+  ASSERT_DOUBLE_EQ(loadIfce.getP(), 0.0);
+  load.getTerminal().setP(1000.0);
+  ASSERT_TRUE(loadIfce.hasP());
+  ASSERT_DOUBLE_EQ(loadIfce.getP(), 0.0);
+
+  ASSERT_DOUBLE_EQ(loadIfce.getQ0(), 400.0);
+  ASSERT_DOUBLE_EQ(loadIfce.getQ(), 0.0);
+  load.getTerminal().setQ(499.0);
+  ASSERT_TRUE(loadIfce.hasQ());
+  ASSERT_DOUBLE_EQ(loadIfce.getQ(), 0.0);
+}  // TEST(DataInterfaceTest, Load_2)
 }  // namespace DYN

@@ -127,7 +127,7 @@ InjectorInterfaceIIDM<T>::getQ() {
 }
 
 template <class T>
-std::string
+const std::string&
 InjectorInterfaceIIDM<T>::getID() const {
   return injectorId_;
 }

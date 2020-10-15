@@ -16,8 +16,8 @@
 
 #include "gtest_dynawo.h"
 
-#include <powsybl/iidm/Line.hpp>
 #include <powsybl/iidm/Bus.hpp>
+#include <powsybl/iidm/Line.hpp>
 #include <powsybl/iidm/LineAdder.hpp>
 #include <powsybl/iidm/Network.hpp>
 #include <powsybl/iidm/Substation.hpp>
