@@ -15,7 +15,7 @@ set(MODULE_SOURCES
   TestCurrentLimitInterface.cpp
   TestInjectorInterface.cpp
   TestLineInterface.cpp
-#  TestLoadInterface.cpp
+  TestLoadInterface.cpp
   TestSwitchInterface.cpp
 )
 

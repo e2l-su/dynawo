@@ -37,7 +37,7 @@ namespace DYN {
 /**
  * class LoadInterfaceIIDM
  */
-class LoadInterfaceIIDM : public LoadInterface, public InjectorInterfaceIIDM<powsybl::iidm::Load> {
+class LoadInterfaceIIDM : public LoadInterface, public InjectorInterfaceIIDM {
  public:
   /**
    * @brief defines the index of each state variable
@@ -113,7 +113,10 @@ class LoadInterfaceIIDM : public LoadInterface, public InjectorInterfaceIIDM<pow
   /**
    * @copydoc LoadInterface::getID() const
    */
-  std::string getID() const;
+  std::string
+  getID() const {
+    return loadIIDM_.getId();
+  }
 
   /**
    * @copydoc LoadInterface::getPUnderVoltage()

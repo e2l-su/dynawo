@@ -19,7 +19,7 @@ set(DATA_INTERFACE_IIDM_SOURCES
 #    DYNCalculatedBusInterfaceIIDM.cpp
     DYNCurrentLimitInterfaceIIDM.cpp
     DYNLineInterfaceIIDM.cpp
-#    DYNLoadInterfaceIIDM.cpp
+    DYNLoadInterfaceIIDM.cpp
     DYNSwitchInterfaceIIDM.cpp
 #   DYNTwoWTransformerInterfaceIIDM.cpp
 #   DYNThreeWTransformerInterfaceIIDM.cpp

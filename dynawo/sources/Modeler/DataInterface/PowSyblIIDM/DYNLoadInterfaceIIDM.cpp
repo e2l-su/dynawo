@@ -26,14 +26,13 @@
 
 using boost::shared_ptr;
 using powsybl::iidm::Load;
-using std::string;
 
 namespace DYN {
 
 LoadInterfaceIIDM::~LoadInterfaceIIDM() {
 }
 
-LoadInterfaceIIDM::LoadInterfaceIIDM(Load& load) : InjectorInterfaceIIDM<Load>(load, load.getId()),
+LoadInterfaceIIDM::LoadInterfaceIIDM(Load& load) : InjectorInterfaceIIDM(load, load.getId()),
                                                    loadIIDM_(load),
                                                    loadPUnderV_(0.),
                                                    v0_(0.),
@@ -46,7 +45,7 @@ LoadInterfaceIIDM::LoadInterfaceIIDM(Load& load) : InjectorInterfaceIIDM<Load>(l
 }
 
 int
-LoadInterfaceIIDM::getComponentVarIndex(const string& varName) const {
+LoadInterfaceIIDM::getComponentVarIndex(const std::string& varName) const {
   int index = -1;
   if (varName == "p")
     index = VAR_P;
@@ -75,9 +74,9 @@ LoadInterfaceIIDM::exportStateVariablesUnitComponent() {
 void
 LoadInterfaceIIDM::importStaticParameters() {
   staticParameters_.clear();
-  double P = getP();
+  double P = InjectorInterfaceIIDM::getP();
   double P0 = getP0();
-  double Q = getQ();
+  double Q = InjectorInterfaceIIDM::getQ();
   double Q0 = getQ0();
   double SN = SNREF;
   SN = 1.5 * sqrt(P * P + Q * Q);
@@ -94,10 +93,10 @@ LoadInterfaceIIDM::importStaticParameters() {
   staticParameters_.insert(std::make_pair("q0", StaticParameter("q0", StaticParameter::DOUBLE).setValue(Q0)));
   staticParameters_.insert(std::make_pair("sn", StaticParameter("sn", StaticParameter::DOUBLE).setValue(SN)));
 
-  if (getBusInterface()) {
-    v0_ = getBusInterface()->getV0();
+  if (InjectorInterfaceIIDM::getBusInterface()) {
+    v0_ = InjectorInterfaceIIDM::getBusInterface()->getV0();
 
-    double teta = getBusInterface()->getAngle0();
+    double teta = InjectorInterfaceIIDM::getBusInterface()->getAngle0();
     staticParameters_.insert(std::make_pair("v_pu", StaticParameter("v_pu", StaticParameter::DOUBLE).setValue(v0_ / vNom_)));
     staticParameters_.insert(std::make_pair("angle_pu", StaticParameter("angle_pu", StaticParameter::DOUBLE).setValue(teta * M_PI / 180)));
     staticParameters_.insert(std::make_pair("v", StaticParameter("v", StaticParameter::DOUBLE).setValue(v0_)));
@@ -115,47 +114,47 @@ LoadInterfaceIIDM::importStaticParameters() {
 
 void
 LoadInterfaceIIDM::setBusInterface(const shared_ptr<BusInterface>& busInterface) {
-  InjectorInterfaceIIDM<Load>::setBusInterface(busInterface);
-}
-
-void
-LoadInterfaceIIDM::setVoltageLevelInterface(const shared_ptr<VoltageLevelInterface>& voltageLevelInterface) {
-  InjectorInterfaceIIDM<Load>::setVoltageLevelInterface(voltageLevelInterface);
+  InjectorInterfaceIIDM::setBusInterface(busInterface);
 }
 
 shared_ptr<BusInterface>
 LoadInterfaceIIDM::getBusInterface() const {
-  return InjectorInterfaceIIDM<Load>::getBusInterface();
+  return InjectorInterfaceIIDM::getBusInterface();
+}
+
+void
+LoadInterfaceIIDM::setVoltageLevelInterface(const shared_ptr<VoltageLevelInterface>& voltageLevelInterface) {
+  InjectorInterfaceIIDM::setVoltageLevelInterface(voltageLevelInterface);
 }
 
 bool
 LoadInterfaceIIDM::getInitialConnected() {
-  return InjectorInterfaceIIDM<Load>::getInitialConnected();
+  return InjectorInterfaceIIDM::getInitialConnected();
 }
 
 double
 LoadInterfaceIIDM::getP() {
-  return InjectorInterfaceIIDM<Load>::getP();
+  return InjectorInterfaceIIDM::getP();
 }
 
+double
+LoadInterfaceIIDM::getQ() {
+  return InjectorInterfaceIIDM::getQ();
+}
+/*
+std::string
+LoadInterfaceIIDM::getID() const {
+  return loadIIDM_.getId();
+}
+*/
 double
 LoadInterfaceIIDM::getP0() {
   return loadIIDM_.getP0();
 }
 
 double
-LoadInterfaceIIDM::getQ() {
-  return InjectorInterfaceIIDM<Load>::getQ();
-}
-
-double
 LoadInterfaceIIDM::getQ0() {
   return loadIIDM_.getQ0();
-}
-
-string
-LoadInterfaceIIDM::getID() const {
-  return loadIIDM_.getId();
 }
 
 double
