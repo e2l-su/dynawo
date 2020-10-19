@@ -179,7 +179,7 @@ class InjectorInterfaceIIDM {
   const powsybl::iidm::Injection& injectorIIDM_;                  ///< reference to the iidm injector instance
   boost::shared_ptr<BusInterface> busInterface_;                  ///< busInterface of the bus where the injector is connected
   boost::weak_ptr<VoltageLevelInterface> voltageLevelInterface_;  ///< voltageLevel interface where the injector is connected
-  std::string injectorId_;                                        ///< injector's id
+  const std::string& injectorId_;                                 ///< injector's id
   boost::optional<bool> initialConnected_;                        ///< whether the injector is initially connected or not
 };
 }  // namespace DYN

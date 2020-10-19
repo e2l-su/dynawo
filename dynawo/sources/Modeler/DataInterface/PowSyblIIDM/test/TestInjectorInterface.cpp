@@ -86,9 +86,6 @@ TEST(DataInterfaceTest, Injector) {
   load.getTerminal().disconnect();
   ASSERT_TRUE(Ifce.getInitialConnected());
 
-  DYN::InjectorInterfaceIIDM IfceNC(Inj, "Injector initialy not connected");
-  ASSERT_FALSE(IfceNC.getInitialConnected());
-
   ASSERT_FALSE(Ifce.hasP());
   ASSERT_FALSE(Ifce.hasQ());
 
@@ -102,9 +99,9 @@ TEST(DataInterfaceTest, Injector) {
   ASSERT_TRUE(Ifce.hasQ());
   ASSERT_DOUBLE_EQ(Ifce.getQ(), 499.0);
 
-  ASSERT_TRUE(Ifce.hasP());  // true since Load is common to Ifce and IfceNC
-  ASSERT_TRUE(Ifce.hasQ());
-  ASSERT_DOUBLE_EQ(IfceNC.getP(), 0.0);  // But 0.0 here since is not initialy connected
+  DYN::InjectorInterfaceIIDM IfceNC(Inj, "Injector initialy not connected");
+  ASSERT_FALSE(IfceNC.getInitialConnected());
+  ASSERT_DOUBLE_EQ(IfceNC.getP(), 0.0);
   ASSERT_DOUBLE_EQ(IfceNC.getQ(), 0.0);
 
   //  // DG FAIRE le test sera réalisé en tout-dernier

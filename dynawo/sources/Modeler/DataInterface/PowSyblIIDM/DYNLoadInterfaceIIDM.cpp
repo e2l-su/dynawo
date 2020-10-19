@@ -141,12 +141,7 @@ double
 LoadInterfaceIIDM::getQ() {
   return InjectorInterfaceIIDM::getQ();
 }
-/*
-std::string
-LoadInterfaceIIDM::getID() const {
-  return loadIIDM_.getId();
-}
-*/
+
 double
 LoadInterfaceIIDM::getP0() {
   return loadIIDM_.getP0();

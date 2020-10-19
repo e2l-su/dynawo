@@ -25,7 +25,6 @@
 #include "DYNLoadInterface.h"
 
 #include "DYNInjectorInterfaceIIDM.h"
-// #include "DYNVoltageLevelInterface.h"
 
 #include <powsybl/iidm/Load.hpp>
 
