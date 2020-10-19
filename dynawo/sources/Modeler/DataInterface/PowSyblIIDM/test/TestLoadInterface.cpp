@@ -66,12 +66,6 @@ TEST(DataInterfaceTest, Load_1) {
       .add();
 
   Load& load = network.getLoad("LOAD1");
-
-  ASSERT_EQ("LOAD1", load.getId());
-  ASSERT_EQ("LOAD1_NAME", load.getOptionalName());
-  ASSERT_EQ(powsybl::iidm::ConnectableType::LOAD, load.getType());
-  ASSERT_EQ(LoadType::UNDEFINED, load.getLoadType());
-
   LoadInterfaceIIDM loadIfce(load);
 
   ASSERT_EQ(loadIfce.getComponentVarIndex(std::string("p")), LoadInterfaceIIDM::VAR_P);
@@ -144,8 +138,8 @@ TEST(DataInterfaceTest, Load_2) {  // tests assuming getInitialConnected == fals
       .setConnectableBus("VL1_BUS1")
       .setName("LOAD1_NAME")
       .setLoadType(LoadType::UNDEFINED)
-      .setP0(500.0)
-      .setQ0(400.0)
+      .setP0(5000.0)
+      .setQ0(4000.0)
       .add();
 
   Load& load = network.getLoad("LOAD");
@@ -155,23 +149,9 @@ TEST(DataInterfaceTest, Load_2) {  // tests assuming getInitialConnected == fals
   load.getTerminal().disconnect();
   ASSERT_FALSE(loadIfce.getInitialConnected());
 
-  load.getTerminal().connect();
-  ASSERT_TRUE(load.getTerminal().isConnected());
-  ASSERT_FALSE(loadIfce.getInitialConnected());
-
   ASSERT_FALSE(loadIfce.hasP());
   ASSERT_FALSE(loadIfce.hasQ());
-
-  ASSERT_DOUBLE_EQ(loadIfce.getP0(), 500.0);
   ASSERT_DOUBLE_EQ(loadIfce.getP(), 0.0);
-  load.getTerminal().setP(1000.0);
-  ASSERT_TRUE(loadIfce.hasP());
-  ASSERT_DOUBLE_EQ(loadIfce.getP(), 0.0);
-
-  ASSERT_DOUBLE_EQ(loadIfce.getQ0(), 400.0);
-  ASSERT_DOUBLE_EQ(loadIfce.getQ(), 0.0);
-  load.getTerminal().setQ(499.0);
-  ASSERT_TRUE(loadIfce.hasQ());
   ASSERT_DOUBLE_EQ(loadIfce.getQ(), 0.0);
 }  // TEST(DataInterfaceTest, Load_2)
 }  // namespace DYN

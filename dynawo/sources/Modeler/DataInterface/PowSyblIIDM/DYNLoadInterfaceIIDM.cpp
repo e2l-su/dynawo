@@ -74,9 +74,9 @@ LoadInterfaceIIDM::exportStateVariablesUnitComponent() {
 void
 LoadInterfaceIIDM::importStaticParameters() {
   staticParameters_.clear();
-  double P = InjectorInterfaceIIDM::getP();
+  double P = getP();
   double P0 = getP0();
-  double Q = InjectorInterfaceIIDM::getQ();
+  double Q = getQ();
   double Q0 = getQ0();
   double SN = SNREF;
   SN = 1.5 * sqrt(P * P + Q * Q);
@@ -93,10 +93,10 @@ LoadInterfaceIIDM::importStaticParameters() {
   staticParameters_.insert(std::make_pair("q0", StaticParameter("q0", StaticParameter::DOUBLE).setValue(Q0)));
   staticParameters_.insert(std::make_pair("sn", StaticParameter("sn", StaticParameter::DOUBLE).setValue(SN)));
 
-  if (InjectorInterfaceIIDM::getBusInterface()) {
-    v0_ = InjectorInterfaceIIDM::getBusInterface()->getV0();
+  if (getBusInterface()) {
+    v0_ = getBusInterface()->getV0();
 
-    double teta = InjectorInterfaceIIDM::getBusInterface()->getAngle0();
+    double teta = getBusInterface()->getAngle0();
     staticParameters_.insert(std::make_pair("v_pu", StaticParameter("v_pu", StaticParameter::DOUBLE).setValue(v0_ / vNom_)));
     staticParameters_.insert(std::make_pair("angle_pu", StaticParameter("angle_pu", StaticParameter::DOUBLE).setValue(teta * M_PI / 180)));
     staticParameters_.insert(std::make_pair("v", StaticParameter("v", StaticParameter::DOUBLE).setValue(v0_)));
@@ -124,7 +124,7 @@ LoadInterfaceIIDM::getBusInterface() const {
 
 void
 LoadInterfaceIIDM::setVoltageLevelInterface(const shared_ptr<VoltageLevelInterface>& voltageLevelInterface) {
-  InjectorInterfaceIIDM::setVoltageLevelInterface(voltageLevelInterface);
+  setVoltageLevelInterface(voltageLevelInterface);
 }
 
 bool

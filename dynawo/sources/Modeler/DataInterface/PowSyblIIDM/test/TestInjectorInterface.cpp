@@ -33,7 +33,7 @@
 
 #include "gtest_dynawo.h"
 
-TEST(DataInterfaceTest, Injector) {
+TEST(DataInterfaceTest, Injector_1) {
   using powsybl::iidm::Bus;
   using powsybl::iidm::Load;
   using powsybl::iidm::LoadType;
@@ -107,4 +107,52 @@ TEST(DataInterfaceTest, Injector) {
   //  // DG FAIRE le test sera réalisé en tout-dernier
   //  ASSERT_EQ(Ifce.getVoltageLevelInterface().get(), nullptr);
   //  getVNom() ;
-}  // TEST(DataInterfaceTest, Injector)
+}  // TEST(DataInterfaceTest, Injector_1)
+
+
+TEST(DataInterfaceTest, Injector_2) {
+  using powsybl::iidm::Load;
+  using powsybl::iidm::LoadType;
+  using powsybl::iidm::Network;
+  using powsybl::iidm::Substation;
+  using powsybl::iidm::TopologyKind;
+  using powsybl::iidm::VoltageLevel;
+
+  Network network("test", "test");
+
+  Substation& substation = network.newSubstation()
+                               .setId("S1")
+                               .setName("S1_NAME")
+                               .setCountry(powsybl::iidm::Country::FR)
+                               .setTso("TSO")
+                               .add();
+
+  VoltageLevel& vl1 = substation.newVoltageLevel()
+                          .setId("VL1")
+                          .setName("VL1_NAME")
+                          .setTopologyKind(TopologyKind::BUS_BREAKER)
+                          .setNominalVoltage(380.0)
+                          .setLowVoltageLimit(340.0)
+                          .setHighVoltageLimit(420.0)
+                          .add();
+
+  vl1.getBusBreakerView().newBus().setId("VL1_BUS1").add();
+
+  vl1.newLoad()
+      .setId("LOAD2")
+      .setBus("VL1_BUS1")
+      .setConnectableBus("VL1_BUS1")
+      .setLoadType(LoadType::UNDEFINED)
+      .setP0(55.0)
+      .setQ0(44.0)
+      .add();
+
+  Load& load = network.getLoad("LOAD2");
+  load.getTerminal().disconnect();
+  const powsybl::iidm::Injection& Inj = load;
+
+  DYN::InjectorInterfaceIIDM IfceNC(Inj, "Injector initialy not connected");
+  ASSERT_FALSE(IfceNC.getInitialConnected());
+  ASSERT_DOUBLE_EQ(IfceNC.getP(), 0.0);
+  ASSERT_DOUBLE_EQ(IfceNC.getQ(), 0.0);
+}  // TEST(DataInterfaceTest, Injector_2)
